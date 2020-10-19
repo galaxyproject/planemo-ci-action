@@ -1,0 +1,41 @@
+name: 'planemo discover'
+description: 'Installs planemo and discovers changed repositories of tools or workflows'
+author: 'iuc@galaxyproject.org'
+inputs:
+  create-cache: 
+    description: 'Set to no if creating a cache is not needed'
+    default: true
+  planemo-version:
+    description: 'Set a specific planemo version or url. If not specified installs latest planemo release from PyPI'
+    default: 'planemo'
+  galaxy-branch:
+    description: 'Galaxy branch to use'
+    default: 'master'
+  galaxy-source:
+    description: 'Galaxy repository to use'
+    default: 'https://github.com/galaxyproject/galaxy'
+outputs:
+  changed-repositories:
+    description: 'List of changed repositories'
+    value: ${{ steps.changed-repositories.outputs.changed-repositories }}
+runs:
+  using: 'composite'
+  steps:
+    - run: pip install wheel ${{ inputs.planemo-version }}
+      shell: bash
+    - name: Fake a Planemo run to update cache
+      run: |
+        if [ $CREATE_CACHE != "false" ]; then
+            touch /tmp/tool.xml
+            PIP_QUIET=1 planemo test --no_conda_auto_init --galaxy_source ${{ inputs.galaxy-source  }} --galaxy_branch ${{ inputs.galaxy-branch  }} /tmp/tool.xml
+        fi
+      shell: bash
+      env:
+        CREATE_CACHE: ${{ inputs.create-cache }}
+    - name: Find commit range to test
+      run: ${{ github.action_path }}/commit_range.sh
+      shell: bash
+    - name: Find changed repositories
+      id: changed-repositories
+      run: echo "::set-output name=changed-repositories::$(planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip)" 
+      shell: bash
