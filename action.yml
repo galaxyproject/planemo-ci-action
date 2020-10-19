@@ -35,6 +35,8 @@ runs:
         CREATE_CACHE: ${{ inputs.create-cache }}
     - name: Find commit range to test
       run: ${{ github.action_path }}/commit_range.sh
+      env:
+        EVENT_BEFORE: ${{ github.event.before }}
       shell: bash
     - name: Find changed repositories
       id: changed-repositories
