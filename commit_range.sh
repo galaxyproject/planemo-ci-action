@@ -11,11 +11,12 @@
 if [ "$GITHUB_EVENT_NAME" =  "push" ]; then
   case "$GITHUB_REF" in
     refs/heads/master|refs/heads/main )
+    COMMIT_RANGE="$EVENT_BEFORE.."
+    ;;
+    *)
     git fetch origin master
     COMMIT_RANGE="origin/master..."
     ;;
-    *)
-    COMMIT_RANGE="$EVENT_BEFORE.."
   esac
 elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   COMMIT_RANGE="HEAD~.."
