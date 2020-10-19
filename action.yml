@@ -3,8 +3,8 @@ description: 'Installs planemo and discovers changed repositories of tools or wo
 author: 'iuc@galaxyproject.org'
 inputs:
   create-cache: 
-    description: 'Set to no if creating a cache is not needed'
-    default: true
+    description: 'Set false if creating a cache is not needed'
+    default: false
   planemo-version:
     description: 'Set a specific planemo version or url. If not specified installs latest planemo release from PyPI'
     default: 'planemo'
@@ -14,15 +14,39 @@ inputs:
   galaxy-source:
     description: 'Galaxy repository to use'
     default: 'https://github.com/galaxyproject/galaxy'
-  run-test:
+  changed-repositories:
+    description: 'List of changed repositories. Only needed if running parallel jobs.'
+    default: ''
+  lint-tools:
+    descriptions: 'Lint planemo tools?'
+    default: false
+  test-tools:
     description: 'Run planemo tests?'
     default: false
-  test-chunks:
+  deploy-tools:
+    description: 'Upload tools to toolshed (after successfull test)?'
+    default: false
+  chunk-count:
     description: 'Number of tests to run in parallel'
     default: 20
-  test_chunk:
-    description: 'Current tet chunk'
+  database_connection:
+    description: 'Database connection to use for tests'
+    default: 'postgresql://postgres:postgres@localhost:5432/galaxy'
+  chunk:
+    description: 'Current test chunk'
     default: 0
+  html-report:
+    description: 'Create HTML report?'
+    default: false
+  markdown-report:
+    description: 'Create markdown report?'
+    default: false
+  shed-target:
+    description: 'Which toolshed to target?'
+    default: 'toolshed'
+  shed-key:
+    description: '(Secret!) tool shed api key'
+    default: 'toolshed'
 
 outputs:
   changed-repositories:
@@ -33,16 +57,26 @@ runs:
   steps:
     - run: pip install wheel ${{ inputs.planemo-version }}
       shell: bash
-    - name: Fake a Planemo run to update cache
-      run: |
-        if [ $CREATE_CACHE != "false" ]; then
-            tmp_dir=$(mktemp -d)
-            touch "$tmp_dir/tool.xml"
-            PIP_QUIET=1 planemo test --no_conda_auto_init --galaxy_source ${{ inputs.galaxy-source  }} --galaxy_branch ${{ inputs.galaxy-branch  }} "$tmp_dir"
-        fi
+    - name: run planemo actions
+      run: ${{ github.action_path }}/planemo_ci_actions.sh
       shell: bash
       env:
+        EVENT_BEFORE: ${{ github.event.before }}
         CREATE_CACHE: ${{ inputs.create-cache }}
+        GALAXY_BRANCH: ${{ inputs.galaxy-branch || env.GALAXY_BRANCH }}
+        GALAXY_SOURCE: ${{ inputs.galaxy-source || env.GALAXY_SOURCE }}
+        CHANGED_REPOSITORIES: ${{ inputs.changed-repositories}}
+        CHUNK: ${{ inputs.chunk }}
+        CHUNK_COUNT: ${{ inputs.chunk-count}}
+        DATABASE_CONNECTION: ${{ inputs.database-connection }}
+        PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
+        PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
+        PLANEMO_DEPLOY_TOOLS: ${{ inputs.deploy-tools }}
+        PLANEMO_COMBINE_OUTPUTS: ${{ inputs.test-tools }}
+        PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
+        PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
+        SHED_TARGET: ${{ inputs.shed-target }}
+        SHED_KEY: ${{ inputs.shed-key }}
     - name: Find commit range to test
       run: ${{ github.action_path }}/commit_range.sh
       env:
