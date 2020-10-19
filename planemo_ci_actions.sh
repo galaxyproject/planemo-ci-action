@@ -82,7 +82,7 @@ fi
 if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
   find . -name test_output.json -exec sh -c 'planemo merge_test_reports "$@" test_output.json' sh {} +
   [ ! -d upload ] && mkdir upload
-  mv test_output.json test_output.html upload/
+  mv test_output.json upload/
   [ "$PLANEMO_HTML_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output upload/test_output.html
   [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output_markdown upload/test_output.md
 fi
