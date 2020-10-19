@@ -14,6 +14,16 @@ inputs:
   galaxy-source:
     description: 'Galaxy repository to use'
     default: 'https://github.com/galaxyproject/galaxy'
+  run-test:
+    description: 'Run planemo tests?'
+    default: false
+  test-chunks:
+    description: 'Number of tests to run in parallel'
+    default: 20
+  test_chunk:
+    description: 'Current tet chunk'
+    default: 0
+
 outputs:
   changed-repositories:
     description: 'List of changed repositories'
@@ -39,6 +49,9 @@ runs:
         EVENT_BEFORE: ${{ github.event.before }}
       shell: bash
     - name: Find changed repositories
-      id: changed-repositories
-      run: echo "::set-output name=changed-repositories::$(planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip)" 
+      run: planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output changed_repositories.list
       shell: bash
+    - run: echo "::set-output name=changed-repositories::$(cat changed_repositories.list)"
+      id: changed-repositories
+      shell: bash
+      
