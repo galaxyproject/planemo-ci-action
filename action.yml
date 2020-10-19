@@ -35,6 +35,9 @@ inputs:
   chunk:
     description: 'Current test chunk'
     default: 0
+  combine-outputs:
+    descripttion: 'Combine multiple test reports into a single output'
+    default: false
   html-report:
     description: 'Create HTML report?'
     default: false
@@ -72,7 +75,7 @@ runs:
         PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
         PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
         PLANEMO_DEPLOY_TOOLS: ${{ inputs.deploy-tools }}
-        PLANEMO_COMBINE_OUTPUTS: ${{ inputs.test-tools }}
+        PLANEMO_COMBINE_OUTPUTS: ${{ inputs.combine-outputs || inputs.test-tools }}
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
