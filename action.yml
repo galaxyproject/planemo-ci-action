@@ -26,8 +26,9 @@ runs:
     - name: Fake a Planemo run to update cache
       run: |
         if [ $CREATE_CACHE != "false" ]; then
-            touch /tmp/tool.xml
-            PIP_QUIET=1 planemo test --no_conda_auto_init --galaxy_source ${{ inputs.galaxy-source  }} --galaxy_branch ${{ inputs.galaxy-branch  }} /tmp/tool.xml
+            tmp_dir=$(mktemp -d)
+            touch "$tmp_dir/tool.xml"
+            PIP_QUIET=1 planemo test --no_conda_auto_init --galaxy_source ${{ inputs.galaxy-source  }} --galaxy_branch ${{ inputs.galaxy-branch  }} "$tmp_dir"
         fi
       shell: bash
       env:
