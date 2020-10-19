@@ -66,8 +66,8 @@ runs:
       env:
         EVENT_BEFORE: ${{ github.event.before }}
         CREATE_CACHE: ${{ inputs.create-cache }}
-        GALAXY_BRANCH: ${{ inputs.galaxy-branch || env.GALAXY_BRANCH }}
-        GALAXY_SOURCE: ${{ inputs.galaxy-source || env.GALAXY_SOURCE }}
+        GALAXY_BRANCH: ${{ inputs.galaxy-branch }}
+        GALAXY_SOURCE: ${{ inputs.galaxy-source }}
         CHANGED_REPOSITORIES: ${{ inputs.changed-repositories}}
         CHUNK: ${{ inputs.chunk }}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
@@ -75,7 +75,7 @@ runs:
         PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
         PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
         PLANEMO_DEPLOY_TOOLS: ${{ inputs.deploy-tools }}
-        PLANEMO_COMBINE_OUTPUTS: ${{ inputs.combine-outputs || inputs.test-tools }}
+        PLANEMO_COMBINE_OUTPUTS: ${{ inputs.combine-outputs }}
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
