@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -ex
 
+PLANEMO_TEST_OPTIONS="--database_connection $DATABASE_CONNECTION --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE"
+PLANEMO_CONTAINER_DEPENDENCIES="--biocontainers --no_dependency_resolution --no_conda_auto_init"
+PLANEMO_WORKFLOW_OPTIONS="--no_paste_test_data_paths --shed_tool_conf /cvmfs/main.galaxyproject.org/config/shed_tool_conf.xml --no_shed_install --tool_data_table /cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml --tool_data_table /cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml --docker_extra_volume /cvmfs "
+export PIP_QUIET=1
+
 if [ "$CREATE_CACHE" != "false" ]; then
   tmp_dir=$(mktemp -d)
   touch "$tmp_dir/tool.xml"
-  PIP_QUIET=1 planemo test --no_conda_auto_init --galaxy_source "$GALAXY_SOURCE" --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
+  planemo test --no_conda_auto_init --galaxy_source "$GALAXY_SOURCE" --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
 fi
 
 if [ "$CHANGED_REPOSITORIES" == "" ]; then
@@ -40,10 +45,14 @@ if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
   planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$CHANGED_REPOSITORIES"
 fi
 
-if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
+if [ "$PLANEMO_LINT_WORKFLOWS" == "true" ]; then
+  planemo workflow_lint --fail_level error "$CHANGED_REPOSITORIES"
+fi
+
+if [ "$PLANEMO_TEST_TOOLS" == "true" ] || [ "$PLANEMO_TEST_WORKFLOWS" == "true" ] ; then
   # Find tools
   touch changed_repositories_chunk.list changed_tools_chunk.list
-  if [ $(wc -l < changed_repositories.list) -eq 1 ]; then
+  if [ $(wc -l < changed_repositories.list) -eq 1 ] && [ "$PLANEMO_TEST_WORKFLOWS" != "true"  ] ; then
       planemo ci_find_tools --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" \
                      --output changed_tools_chunk.list \
                      $(cat changed_repositories.list)
@@ -53,17 +62,19 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
                      $(cat changed_repositories.list)
   fi
 
-  # show tools
+  # show tools or workflows
   cat changed_tools_chunk.list changed_repositories_chunk.list
-  # test tools
+  # test tools or workflows
   if grep -lqf .tt_biocontainer_skip changed_tools_chunk.list changed_repositories_chunk.list; then
           PLANEMO_OPTIONS=""
   else
-          PLANEMO_OPTIONS="--biocontainers --no_dependency_resolution --no_conda_auto_init"
+          PLANEMO_OPTIONS=$PLANEMO_CONTAINER_DEPENDENCIES
+  fi
+  if [ "$PLANEMO_TEST_WORKFLOWS" == "true" ]; then
+      PLANEMO_OPTIONS="$PLANEMO_OPTIONS $PLANEMO_WORKFLOW_OPTIONS"
   fi
   if [ -s changed_tools_chunk.list ]; then
-      PIP_QUIET=1 planemo test --database_connection "$DATABASE_CONNECTION" $PLANEMO_OPTIONS --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE --test_output_json test_output.json $(cat changed_tools_chunk.list) || true
-      docker system prune --all --force --volumes || true
+      planemo test $PLANEMO_TEST_OPTIONS $PLANEMO_OPTIONS --test_output_json test_output.json $(cat changed_tools_chunk.list) || true
   elif [ -s changed_repositories_chunk.list ]; then
       while read -r DIR; do
           if [[ "$DIR" =~ ^data_managers.* ]]; then
@@ -71,7 +82,7 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
           else
               TESTPATH="$DIR"
           fi
-          PIP_QUIET=1 planemo test --database_connection "$DATABASE_CONNECTION" $PLANEMO_OPTIONS --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE --test_output_json "$DIR"/test_output.json "$TESTPATH" || true
+          planemo test $PLANEMO_TEST_OPTIONS $PLANEMO_OPTIONS --test_output_json "$DIR"/test_output.json "$TESTPATH" || true
           docker system prune --all --force --volumes || true
       done < changed_repositories_chunk.list
   else
@@ -87,8 +98,14 @@ if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
   [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output_markdown upload/test_output.md
 fi
 
-if [ "$PLANEMO_DEPLOY" == "true" ]; then
+if [ "$PLANEMO_SHED_UPDATE" == "true" ]; then
    while read -r DIR; do
        planemo shed_update --shed_target "$SHED_TARGET" --shed_key "$SHED_KEY" --force_repository_creation "$DIR" || exit 1;
+   done < changed_repositories.list
+fi
+
+if [ "$PLANEMO_WORKFLOW_UPLOAD" == "true" ]; then
+   while read -r DIR; do
+       planemo workflow_upload --namespace "$WORKFLOW_NAMESPACE" || exit 1;
    done < changed_repositories.list
 fi

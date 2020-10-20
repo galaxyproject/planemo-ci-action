@@ -23,12 +23,24 @@ inputs:
   test-tools:
     description: 'Run planemo tests?'
     default: false
-  deploy-tools:
+  test-workflows:
+    description: 'Run workflow tests?'
+    default: false
+  shed-update:
     description: 'Upload tools to toolshed (after successfull test)?'
     default: false
+  workflow-upload:
+    description: 'Upload workflow to github organization'
+    default: false
+  workflow-namespace:
+    description: 'Github namespace under which to create workfow repositories'
+    default: 'iwc-workflows'
+  github-token:
+    description: '(Secret!) Github PAT token. Needed for creating workflow repositories with workflow-upload'
+    default: ''
   chunk-count:
     description: 'Number of tests to run in parallel'
-    default: 20
+    default: 1
   database_connection:
     description: 'Database connection to use for tests'
     default: 'postgresql://postgres:postgres@localhost:5432/galaxy'
@@ -49,7 +61,7 @@ inputs:
     default: 'toolshed'
   shed-key:
     description: '(Secret!) tool shed api key'
-    default: 'toolshed'
+    default: ''
 
 outputs:
   changed-repositories:
@@ -74,7 +86,11 @@ runs:
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
         PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
         PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
-        PLANEMO_DEPLOY_TOOLS: ${{ inputs.deploy-tools }}
+        PLANEMO_TEST_WORKFLOWS: ${{ inputs.test-workflows }}
+        PLANEMO_SHED_UPDATE: ${{ inputs.shed-update }}
+        PLANEMO_WORKFLOW_UPLOAD: ${{ inputs.workflow-upload }}
+        PLANEMO_WORKFLOW_NAMESPACE: ${{ inputs.workflow-namespace }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
         PLANEMO_COMBINE_OUTPUTS: ${{ inputs.combine-outputs }}
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
