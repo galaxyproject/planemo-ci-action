@@ -18,7 +18,10 @@ inputs:
     description: 'List of changed repositories. Only needed if running parallel jobs.'
     default: ''
   lint-tools:
-    descriptions: 'Lint planemo tools?'
+    descriptions: 'Lint tools?'
+    default: false
+  lint-workflows:
+    descriptions: 'Lint workflows?'
     default: false
   test-tools:
     description: 'Run planemo tests?'
@@ -85,6 +88,7 @@ runs:
         CHUNK_COUNT: ${{ inputs.chunk-count}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
         PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
+        PLANEMO_LINT_WORKFLOWS: ${{ inputs.lint-workflows }}
         PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
         PLANEMO_TEST_WORKFLOWS: ${{ inputs.test-workflows }}
         PLANEMO_SHED_UPDATE: ${{ inputs.shed-update }}
