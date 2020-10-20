@@ -75,7 +75,7 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ] || [ "$PLANEMO_TEST_WORKFLOWS" == "true" 
           PLANEMO_OPTIONS=$PLANEMO_CONTAINER_DEPENDENCIES
   fi
   if [ "$PLANEMO_TEST_WORKFLOWS" == "true" ]; then
-      PLANEMO_OPTIONS="$PLANEMO_OPTIONS $PLANEMO_WORKFLOW_OPTIONS"
+      PLANEMO_OPTIONS=$PLANEMO_OPTIONS $PLANEMO_WORKFLOW_OPTIONS
   fi
   if [ -s changed_tools_chunk.list ]; then
       planemo test $PLANEMO_TEST_OPTIONS $PLANEMO_OPTIONS --test_output_json test_output.json $(cat changed_tools_chunk.list) || true
