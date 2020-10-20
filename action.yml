@@ -50,6 +50,9 @@ inputs:
   chunk:
     description: 'Current test chunk'
     default: 0
+  setup-cvmfs:
+    description: "Setup CVMFS mount for main.galaxyproject.org and data.galaxyproject.org"
+    default: false
   combine-outputs:
     descripttion: 'Combine multiple test reports into a single output'
     default: false
@@ -95,6 +98,7 @@ runs:
         PLANEMO_WORKFLOW_UPLOAD: ${{ inputs.workflow-upload }}
         PLANEMO_WORKFLOW_NAMESPACE: ${{ inputs.workflow-namespace }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
+        SETUP_CVMFS: ${{ input.setup-cvmfs }}
         PLANEMO_COMBINE_OUTPUTS: ${{ inputs.combine-outputs }}
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}

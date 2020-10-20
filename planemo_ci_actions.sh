@@ -41,6 +41,10 @@ else
   echo "$CHANGED_REPOSITORIES" > changed_repositories.list
 fi
 
+if [ "$SETUP_CVMFS" == "true" ]; then
+  ./cvmfs/setup_cvmfs.sh
+fi
+
 if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
   planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$CHANGED_REPOSITORIES"
 fi
