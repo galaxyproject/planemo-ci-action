@@ -34,7 +34,7 @@ if [ "$CHANGED_REPOSITORIES" == "" ]; then
   elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     COMMIT_RANGE="HEAD~.."
   fi
-
+  touch .tt_skip
   planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output changed_repositories.list
   CHANGED_REPOSITORIES=$(cat changed_repositories.list)
 else
