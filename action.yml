@@ -44,7 +44,7 @@ inputs:
   chunk-count:
     description: 'Number of tests to run in parallel'
     default: 1
-  database_connection:
+  database-connection:
     description: 'Database connection to use for tests'
     default: 'postgresql://postgres:postgres@localhost:5432/galaxy'
   chunk:
