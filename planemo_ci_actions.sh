@@ -3,7 +3,7 @@ set -ex
 
 PLANEMO_TEST_OPTIONS="--database_connection $DATABASE_CONNECTION --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE"
 PLANEMO_CONTAINER_DEPENDENCIES="--biocontainers --no_dependency_resolution --no_conda_auto_init"
-PLANEMO_WORKFLOW_OPTIONS="--no_paste_test_data_paths --shed_tool_conf /cvmfs/main.galaxyproject.org/config/shed_tool_conf.xml --no_shed_install --tool_data_table /cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml --tool_data_table /cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml --docker_extra_volume /cvmfs "
+PLANEMO_WORKFLOW_OPTIONS="--shed_tool_conf /cvmfs/main.galaxyproject.org/config/shed_tool_conf.xml --no_shed_install --tool_data_table /cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml --tool_data_table /cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml --docker_extra_volume /cvmfs "
 export PIP_QUIET=1
 
 if [ "$CREATE_CACHE" != "false" ]; then
