@@ -10,12 +10,15 @@ inputs:
     default: 'planemo'
   galaxy-branch:
     description: 'Galaxy branch to use'
-    default: 'master'
-  galaxy-source:
-    description: 'Galaxy repository to use'
-    default: 'https://github.com/galaxyproject/galaxy'
-  changed-repositories:
-    description: 'List of changed repositories. Only needed if running parallel jobs.'
+    default: ''
+  galaxy-fork:
+    description: 'Galaxy fork to use'
+    default: ''
+  python-version:
+    description: 'Python version to use'
+    default: '3.7'
+  repositories:
+    description: 'List of repositories.'
     default: ''
   lint-tools:
     descriptions: 'Lint planemo tools?'
@@ -35,8 +38,14 @@ inputs:
   chunk:
     description: 'Current test chunk'
     default: 0
+  max-chunks:
+    description: 'Maximum number of chunks to use.'
+    default: 0
   combine-outputs:
     descripttion: 'Combine multiple test reports into a single output'
+    default: false
+  check-outputs:
+    descripttion: 'Check test report for errors'
     default: false
   html-report:
     description: 'Create HTML report?'
@@ -50,15 +59,40 @@ inputs:
   shed-key:
     description: '(Secret!) tool shed api key'
     default: 'toolshed'
+  tools:
+    description: 'List of tools'
+    default: ''
 
 outputs:
-  changed-repositories:
-    description: 'List of changed repositories'
-    value: ${{ steps.changed-repositories.outputs.changed-repositories }}
+  commit-range:
+    description: 'Commit range'
+    value: ${{ steps.commit-range.outputs.commit-range }}
+  repositories:
+    description: 'List of repositories'
+    value: ${{ steps.repositories.outputs.repositories }}
+  tools:
+    description: 'List of tools'
+    value: ${{ steps.tools.outputs.tools }}
+  chunk-count:
+    description: 'Number of chunks to use'
+    value: ${{ steps.chunk-count.outputs.chunk-count }}
+  chunk-list:
+    description: "List of chunks"
+    value: ${{ steps.chunk-list.outputs.chunk-list }}
+  statistics:
+    description: "Statistics of combined repositories"
+    value: ${{ steps.statistics.outputs.statistics }}
+
 runs:
   using: 'composite'
   steps:
-    - run: pip install wheel ${{ inputs.planemo-version }}
+    # Install the `wheel` package so that when installing other packages which
+    # are not available as wheels, pip will build a wheel for them, which can be cached.
+    - name: Install planemo
+      run: pip install wheel ${{ inputs.planemo-version }}
+      shell: bash
+    - name: Install jq
+      run: sudo apt-get install jq
       shell: bash
     - name: run planemo actions
       run: ${{ github.action_path }}/planemo_ci_actions.sh
@@ -67,20 +101,50 @@ runs:
         EVENT_BEFORE: ${{ github.event.before }}
         CREATE_CACHE: ${{ inputs.create-cache }}
         GALAXY_BRANCH: ${{ inputs.galaxy-branch }}
-        GALAXY_SOURCE: ${{ inputs.galaxy-source }}
-        CHANGED_REPOSITORIES: ${{ inputs.changed-repositories}}
+        GALAXY_FORK: ${{ inputs.galaxy-fork }}
+        PYTHON_VERSION: ${{ inputs.python-version }}
+        REPOSITORIES: ${{ inputs.repositories}}
+        TOOLS: ${{ inputs.tools }}
         CHUNK: ${{ inputs.chunk }}
+        MAX_CHUNKS: ${{ inputs.max-chunks}}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
         PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
         PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
         PLANEMO_DEPLOY_TOOLS: ${{ inputs.deploy-tools }}
         PLANEMO_COMBINE_OUTPUTS: ${{ inputs.combine-outputs }}
+        PLANEMO_CHECK_OUTPUTS: ${{ inputs.check-outputs }}
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
-    - run: echo "::set-output name=changed-repositories::$(cat changed_repositories.list)"
-      id: changed-repositories
+
+    # see https://trstringer.com/github-actions-multiline-strings/
+    - run: |
+        REPOS=$(cat repository_list.txt)
+        REPOS="${REPOS//'%'/'%25'}"
+        REPOS="${REPOS//$'\n'/'%0A'}"
+        REPOS="${REPOS//$'\r'/'%0D'}"
+        echo "::set-output name=repositories::$REPOS"
+      id: repositories
       shell: bash
-      
+    - run: |
+        TOOLS=$(cat tool_list.txt)
+        TOOLS="${TOOLS//'%'/'%25'}"
+        TOOLS="${TOOLS//$'\n'/'%0A'}"
+        TOOLS="${TOOLS//$'\r'/'%0D'}"
+        echo "::set-output name=tools::$TOOLS"
+      id: tools
+      shell: bash
+    - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
+      id: commit-range
+      shell: bash
+    - run: echo "::set-output name=chunk-count::$(cat chunk_count.txt)"
+      id: chunk-count
+      shell: bash
+    - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]"
+      id: chunk-list
+      shell: bash
+    - run: echo ::set-output name=statistics::$(cat statistics.txt)
+      id: statistics
+      shell: bash
