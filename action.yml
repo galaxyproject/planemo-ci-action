@@ -17,22 +17,33 @@ inputs:
   python-version:
     description: 'Python version to use'
     default: '3.7'
-  repositories:
+  repository-list:
     description: 'List of repositories.'
     default: ''
-  lint-tools:
-    descriptions: 'Lint planemo tools?'
+  tool-list:
+    description: 'List of tools'
+    default: ''
+  # Mode selectors
+  lint-mode:
+    descriptions: 'Run lint mode?'
     default: false
-  test-tools:
-    description: 'Run planemo tests?'
+  test-mode:
+    description: 'Run test mode?'
     default: false
-  deploy-tools:
+  combine-mode:
+    descripttion: 'Combine multiple test reports into a single output'
+    default: false
+  check-mode:
+    descripttion: 'Check test report for errors'
+    default: false
+  deploy-mode:
     description: 'Upload tools to toolshed (after successfull test)?'
     default: false
+
   chunk-count:
     description: 'Number of tests to run in parallel'
     default: 20
-  database_connection:
+  database-connection:
     description: 'Database connection to use for tests'
     default: 'postgresql://postgres:postgres@localhost:5432/galaxy'
   chunk:
@@ -41,12 +52,6 @@ inputs:
   max-chunks:
     description: 'Maximum number of chunks to use.'
     default: 0
-  combine-outputs:
-    descripttion: 'Combine multiple test reports into a single output'
-    default: false
-  check-outputs:
-    descripttion: 'Check test report for errors'
-    default: false
   html-report:
     description: 'Create HTML report?'
     default: false
@@ -59,20 +64,26 @@ inputs:
   shed-key:
     description: '(Secret!) tool shed api key'
     default: 'toolshed'
-  tools:
-    description: 'List of tools'
-    default: ''
+  setup-cvmfs:
+    description: "Setup CVMFS mount for main.galaxyproject.org and data.galaxyproject.org"
+    default: false
+  workflows:
+    description: "CI for workflows instead of tools"
+    default: false
+  workflow-namespace:
+    description: 'Github namespace under which to create workfow repositories'
+    default: 'iwc-workflows'
 
 outputs:
   commit-range:
     description: 'Commit range'
     value: ${{ steps.commit-range.outputs.commit-range }}
-  repositories:
+  repository-list:
     description: 'List of repositories'
-    value: ${{ steps.repositories.outputs.repositories }}
-  tools:
+    value: ${{ steps.repository-list.outputs.repository-list }}
+  tool-list:
     description: 'List of tools'
-    value: ${{ steps.tools.outputs.tools }}
+    value: ${{ steps.tool-list.outputs.tool-list }}
   chunk-count:
     description: 'Number of chunks to use'
     value: ${{ steps.chunk-count.outputs.chunk-count }}
@@ -103,21 +114,24 @@ runs:
         GALAXY_BRANCH: ${{ inputs.galaxy-branch }}
         GALAXY_FORK: ${{ inputs.galaxy-fork }}
         PYTHON_VERSION: ${{ inputs.python-version }}
-        REPOSITORIES: ${{ inputs.repositories}}
-        TOOLS: ${{ inputs.tools }}
+        REPOSITORIES: ${{ inputs.repository-list}}
+        TOOLS: ${{ inputs.tool-list }}
         CHUNK: ${{ inputs.chunk }}
         MAX_CHUNKS: ${{ inputs.max-chunks}}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
-        PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
-        PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
-        PLANEMO_DEPLOY_TOOLS: ${{ inputs.deploy-tools }}
-        PLANEMO_COMBINE_OUTPUTS: ${{ inputs.combine-outputs }}
-        PLANEMO_CHECK_OUTPUTS: ${{ inputs.check-outputs }}
+        LINT_MODE: ${{ inputs.lint-mode }}
+        TEST_MODE: ${{ inputs.test-mode }}
+        COMBINE_MODE: ${{ inputs.combine-mode }}
+        DEPLOY_MODE: ${{ inputs.deploy-mode }}
+        CHECK_MODE: ${{ inputs.check-mode }}
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
+        SETUP_CVMFS: ${{ inputs.setup-cvmfs }}
+        WORKFLOW_NAMESPACE: ${{ inputs.workflow-namespace }} 
+        WORKFLOWS: ${{ inputs.workflows }}
 
     # see https://trstringer.com/github-actions-multiline-strings/
     - run: |
@@ -125,16 +139,16 @@ runs:
         REPOS="${REPOS//'%'/'%25'}"
         REPOS="${REPOS//$'\n'/'%0A'}"
         REPOS="${REPOS//$'\r'/'%0D'}"
-        echo "::set-output name=repositories::$REPOS"
-      id: repositories
+        echo "::set-output name=repository-list::$REPOS"
+      id: repository-list
       shell: bash
     - run: |
         TOOLS=$(cat tool_list.txt)
         TOOLS="${TOOLS//'%'/'%25'}"
         TOOLS="${TOOLS//$'\n'/'%0A'}"
         TOOLS="${TOOLS//$'\r'/'%0D'}"
-        echo "::set-output name=tools::$TOOLS"
-      id: tools
+        echo "::set-output name=tool-list::$TOOLS"
+      id: tool-list
       shell: bash
     - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
       id: commit-range
