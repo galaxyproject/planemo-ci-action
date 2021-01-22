@@ -1,0 +1,38 @@
+<tool id="test1" name="test1" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="20.01" license="MIT">
+    <description>test1</description>
+    <macros>
+        <token name="@TOOL_VERSION@">0.1.0</token>
+        <token name="@VERSION_SUFFIX@">0</token>
+    </macros>
+    <command detect_errors="exit_code"><![CDATA[
+        echo test > '$out'
+    ]]></command>
+    <inputs>
+        <param argument="bool" type="boolean" truevalue="bool" falsevalue="" label="" help="TODO" />
+    </inputs>
+    <outputs>
+        <data name="out" format="txt"/>
+    </outputs>
+    <tests>
+        <test>
+            <param name="bool" value="true"/>
+            <output name="out">
+                <assert_contents>
+                    <has_text text="test"/>
+                </assert_contents>
+            </output>
+        </test>
+    </tests>
+    <help><![CDATA[
+
+**Input**
+
+
+**Output**
+
+
+    ]]></help>
+    <citations>
+        <citation type="doi">blah</citation>
+    </citations>
+</tool>
