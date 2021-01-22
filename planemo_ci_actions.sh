@@ -26,7 +26,7 @@ fi
 #   of tools (limited by MAX_CHUNK)
 if [ "$REPOSITORIES" == "" ] && [ "$LINT_MODE" != "true" ] && [ "$TEST_MODE" != "true" ] && [ "$COMBINE_MODE" != "true" ] && [ "$CHECK_MODE" != "true" ] && [ "$DEPLOY_MODE" != "true" ]; then
   # The range of commits to check for changes is:
-  # - `origin/master...` for all events happening on a feature branch
+  # - `origin/main...` (resp. `origin/master`) for all events happening on afeature branch
   # - for events on the master branch we compare against the sha before the event
   #   (note that this does not work for feature branch events since we want all
   #   commits on the feature branch and not just the commits of the last event)
@@ -39,8 +39,12 @@ if [ "$REPOSITORIES" == "" ] && [ "$LINT_MODE" != "true" ] && [ "$TEST_MODE" != 
       COMMIT_RANGE="$EVENT_BEFORE.."
       ;;
       *)
-      git fetch origin master
-      COMMIT_RANGE="origin/master..."
+      if git fetch origin main; then
+        COMMIT_RANGE="origin/main..."
+      else
+        git fetch origin master
+        COMMIT_RANGE="origin/master..."
+      fi
       ;;
     esac
   elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
