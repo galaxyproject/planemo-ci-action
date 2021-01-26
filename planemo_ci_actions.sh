@@ -57,11 +57,11 @@ if [ "$REPOSITORIES" == "" ] && [ "$LINT_MODE" != "true" ] && [ "$TEST_MODE" != 
   fi
   
   touch .tt_skip
-  planemo ci_find_repos "$PLANEMO_COMMIT_RANGE" --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
+  planemo ci_find_repos $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 
   # TODO check: run ci_find_tools on complete repo has the advantage that it can be reused in the linting step
-  planemo ci_find_tools "$PLANEMO_COMMIT_RANGE" --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
+  planemo ci_find_tools $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
   TOOLS=$(cat tool_list.txt)
   # touch tool_list.txt
   # if [ -s repository_list.txt ]; then
