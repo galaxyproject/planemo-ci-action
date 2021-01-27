@@ -25,16 +25,16 @@ inputs:
     default: ''
   # Mode selectors
   lint-mode:
-    descriptions: 'Run lint mode?'
+    description: 'Run lint mode?'
     default: false
   test-mode:
     description: 'Run test mode?'
     default: false
   combine-mode:
-    descripttion: 'Combine multiple test reports into a single output'
+    description: 'Combine multiple test reports into a single output'
     default: false
   check-mode:
-    descripttion: 'Check test report for errors'
+    description: 'Check test report for errors'
     default: false
   deploy-mode:
     description: 'Upload tools to toolshed (after successfull test)?'
