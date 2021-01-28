@@ -95,7 +95,8 @@ else
   echo "$TOOLS" > tool_list.txt
   echo "$CHUNK_COUNT" > chunk_count.txt
 fi
-
+cat tool_list.txt
+wc tool_list.txt
 # lint mode
 # - call `planemo lint` for each repo
 # - check if each tool is in a repo (i.e. if `.shed.yml` is present)
