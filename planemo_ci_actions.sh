@@ -63,15 +63,15 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   planemo ci_find_repos $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 
+  touch tool_list.txt
   if [ "$WORKFLOWS" != "true" ]; then
     # TODO check: run ci_find_tools on complete repo has the advantage that it can be reused in the linting step
     planemo ci_find_tools $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
     TOOLS=$(cat tool_list.txt)
+    # if [ -s repository_list.txt ]; then
+    #   planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
+    # fi
   fi
-  # touch tool_list.txt
-  # if [ -s repository_list.txt ]; then
-  #   planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
-  # fi
 
   if [ "$WORKFLOWS" != "true" ]; then
     ln -s tool_list.txt count_list.txt
