@@ -1,16 +1,23 @@
 Planemo discover action
 =======================
 
-Installs planemo and discovers changed workflows and tools to test.
+Installs planemo, discovers changed workflows and tools, and allows to lint, test or deploy them.
 
-The action runs in one of six modes which are controled with the following
-boolean inputs:
+The reference use cases of this action are the [pull request](https://github.com/galaxyproject/tools-iuc/blob/master/.github/workflows/pr.yaml) and [continuous integration](https://github.com/galaxyproject/tools-iuc/blob/master/.github/workflows/ci.yaml) workflows of the [intergalactic utility comission (IUC)](https://github.com/galaxyproject/tools-iuc/).
 
-- `lint-tools`: Lint tools with `planemo shed_lint` and check presence of repository metadata files (`.shed.yml`).
-- `test-tools`: Test tools with `planemo test`.
-- `combine-outputs`: Combine the outputs from individual tool tests (`planemo merge_test_reports`) and create html/markdown reports (`planemo test_reports`).
-- `check-outputs`: Check if any of the tests failed.
-- `deploy-tool`: Deploy tools to a toolshed using `planemo shed_update`.
+
+The action runs in one of six modes which are controled with the `mode` inputs. Possible values are:
+
+- `setup`: This is the default. 
+  - Optionally do a fake `planemo test` run to fill `.cache/pip`  and `.planemo` for caching.
+  - Determine the relevant commit range. 
+  - Determine the set of relevant repositories and tools.
+  - Determine the number of chunks and the chunk list.
+- `lint`: Lint tools with `planemo shed_lint` (resp. workflows with `planemo workflow_lint`) and check presence of repository metadata files (`.shed.yml`).
+- `test`: Test tools or workflows with `planemo test`.
+- `combine`: Combine the outputs from individual tool tests (`planemo merge_test_reports`) and create html/markdown reports (`planemo test_reports`).
+- `check`: Check if any of the tests failed.
+- `deploy`: Deploy tools to a toolshed using `planemo shed_update` and workflows to a github namespace, resp.
 
 If none of these inputs is set then a setup mode runs.
 
@@ -25,16 +32,15 @@ The action currently only works on workflows using an Ubuntu image.
 Assumptions on the repository
 -----------------------------
 
-Two files `.tt_skip` and `.tt_biocontainer_skip` must be present. They may contain path (or prefixes of paths). 
-Tools in a path that has a prefix in:
+Two files `.tt_skip` and `.tt_biocontainer_skip` containing paths (or prefixes of paths) can be used
+to skip or modify the testing for tools.
 
+Tools/workflows in a path that has a prefix in:
 
 - `.tt_skip` are ignored in all modes
 - `.tt_biocontainer_skip` are not tested using containers but conda is used for resolving requirements.
 
-Tools and tool repositories are discovered in all directories, except for `packages/` and `deprecated/`. These directories may be absent.
-
-
+Tools and workflows are discovered in all directories, except for `packages/` and `deprecated/`. These directories may be absent.
 
 Setup mode
 ----------
@@ -50,6 +56,7 @@ This mode runs if no other mode is selected. It:
 
 Optional inputs: 
 
+- `workflows`: look for workflows instead of tools
 - `create-cache` (default `false`)
 - `galaxy-branch` (default latest Galaxy release)
 - `galaxy-source` (default `galaxyproject`)
@@ -59,8 +66,8 @@ Optional inputs:
 Outputs:
 
 - `commit-range`: The used commit range.
-- `tools`: List of tools.
-- `repositories` List of repositories.
+- `tool-list`: List of tools.
+- `repository-list` List of repositories.
 - `chunk-count`: Number of chunks to use.
 - `chunk-list`: List of chunks
 
@@ -71,8 +78,8 @@ Calls `planemo shed_lint` for each repository and checks if each tool is in a re
 
 Inputs (all of them required):
 
-- `repositories` 
-- `tools`
+- `repository-list` 
+- `tool-list`
 
 Test mode
 ---------
@@ -83,7 +90,9 @@ will produce a non-zero exit code even if the tests fail. Success needs to be ch
 
 Inputs:
 
-- `repositories`: List of repositories
+- `repository-list`: List of repositories
+- `workflows`: test workflows
+- `setup-cvmfs`: setup CVMFS (only useful for testing workflows)
 - `chunk`: Current chunk
 - `chunk-count`: Maximum chunk
 
@@ -138,5 +147,7 @@ Deploy all repositories to a toolshed.
 
 Inputs:
 
+- `workflows`: deploy workflows to github namespace
+- `workflow-namespace`
 - `shed-target` toolshed name (e.g. `"toolshed"` or `"testtoolshed"`)
 - `shed-key` API key for the toolshed
