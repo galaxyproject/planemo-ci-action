@@ -3,14 +3,18 @@ Planemo discover action
 
 Installs planemo, discovers changed workflows and tools, and allows to lint, test or deploy them.
 
-The action runs in one of six modes which are controled with the following
-boolean inputs:
+The action runs in one of six modes which are controled with the `mode` inputs. Possible values are:
 
-- `lint-mode`: Lint tools with `planemo shed_lint` (resp. workflows with `planemo workflow_lint`) and check presence of repository metadata files (`.shed.yml`).
-- `test-mode`: Test tools or workflows with `planemo test`.
-- `combine-mode`: Combine the outputs from individual tool tests (`planemo merge_test_reports`) and create html/markdown reports (`planemo test_reports`).
-- `check-mode`: Check if any of the tests failed.
-- `deploy-mode`: Deploy tools to a toolshed using `planemo shed_update` and workflows to a github namespace, resp.
+- `setup`: This is the default. 
+  - Optionally do a fake `planemo test` run to fill `.cache/pip`  and `.planemo` for caching.
+  - Determine the relevant commit range. 
+  - Determine the set of relevant repositories and tools.
+  - Determine the number of chunks and the chunk list.
+- `lint`: Lint tools with `planemo shed_lint` (resp. workflows with `planemo workflow_lint`) and check presence of repository metadata files (`.shed.yml`).
+- `test`: Test tools or workflows with `planemo test`.
+- `combine`: Combine the outputs from individual tool tests (`planemo merge_test_reports`) and create html/markdown reports (`planemo test_reports`).
+- `check`: Check if any of the tests failed.
+- `deploy`: Deploy tools to a toolshed using `planemo shed_update` and workflows to a github namespace, resp.
 
 If none of these inputs is set then a setup mode runs.
 
