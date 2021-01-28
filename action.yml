@@ -2,6 +2,9 @@ name: 'planemo discover'
 description: 'Installs planemo and discovers changed repositories of tools or workflows'
 author: 'iuc@galaxyproject.org'
 inputs:
+  mode:
+    descriptions: 'Mode selector: setup|lint|test|combine|check|deploy'
+    default: 'setup'
   create-cache: 
     description: 'Set false if creating a cache is not needed'
     default: false
@@ -23,23 +26,6 @@ inputs:
   tool-list:
     description: 'List of tools'
     default: ''
-  # Mode selectors
-  lint-mode:
-    descriptions: 'Run lint mode?'
-    default: false
-  test-mode:
-    description: 'Run test mode?'
-    default: false
-  combine-mode:
-    descripttion: 'Combine multiple test reports into a single output'
-    default: false
-  check-mode:
-    descripttion: 'Check test report for errors'
-    default: false
-  deploy-mode:
-    description: 'Upload tools to toolshed (after successfull test)?'
-    default: false
-
   chunk-count:
     description: 'Number of tests to run in parallel'
     default: 20
@@ -120,11 +106,7 @@ runs:
         MAX_CHUNKS: ${{ inputs.max-chunks}}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
-        LINT_MODE: ${{ inputs.lint-mode }}
-        TEST_MODE: ${{ inputs.test-mode }}
-        COMBINE_MODE: ${{ inputs.combine-mode }}
-        DEPLOY_MODE: ${{ inputs.deploy-mode }}
-        CHECK_MODE: ${{ inputs.check-mode }}
+        MODE: ${{ inputs.mode }}
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}

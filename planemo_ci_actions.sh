@@ -24,7 +24,7 @@ fi
 #     `packages/` or `deprecated/`
 # - determine chunk count as linear function of the number
 #   of tools (limited by MAX_CHUNK)
-if [ "$REPOSITORIES" == "" ] && [ "$LINT_MODE" != "true" ] && [ "$TEST_MODE" != "true" ] && [ "$COMBINE_MODE" != "true" ] && [ "$CHECK_MODE" != "true" ] && [ "$DEPLOY_MODE" != "true" ]; then
+if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   # The range of commits to check for changes is:
   # - `origin/main...` (resp. `origin/master`) for all events happening on afeature branch
   # - for events on the master branch we compare against the sha before the event
@@ -91,7 +91,7 @@ fi
 # lint mode
 # - call `planemo lint` for each repo
 # - check if each tool is in a repo (i.e. if `.shed.yml` is present)
-if [ "$LINT_MODE" == "true" ] || [ "$PLANEMO_LINT_WORKFLOWS" == "true" ]; then
+if [ "$MODE" == "lint" ]; then
   while read -r DIR; do
     if [ "$WORKFLOWS" != "true" ]; then
       planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR";
@@ -114,7 +114,7 @@ fi
 # - compute grouped chunked tool list
 # - run `planemo test` each tool group
 # - merge the test reports for the tool groups
-if [ "$TEST_MODE" == "true" ]; then
+if [ "$MODE" == "test" ]; then
 
   if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
     "$GITHUB_ACTION_PATH"/cvmfs/setup_cvmfs.sh
@@ -165,7 +165,7 @@ fi
 # - combine the reports of the chunks
 # - optionally generate html / markdown reports
 # - compute statistics
-if [ "$COMBINE_MODE" == "true" ]; then
+if [ "$MODE" == "combine" ]; then
   # combine test reports in artifacts into a single one (upload/tool_test_output.json)
   find artifacts/ -name tool_test_output.json -exec sh -c 'planemo merge_test_reports "$@" upload/tool_test_output.json' sh {} +
   # create html and markdown reports
@@ -177,7 +177,7 @@ fi
 
 # check outputs mode
 # - check if there were unsuccessful tests
-if [ "$CHECK_MODE" == "true" ]; then
+if [ "$MODE" == "check" ]; then
 
   if jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | grep -v "success"; then
     echo "Unsuccessful tests found, inspect the 'All tool test results' artifact for details."
@@ -186,7 +186,7 @@ if [ "$CHECK_MODE" == "true" ]; then
 fi
 
 # deploy mode
-if [ "$DEPLOY_MODE" == "true" ]; then
+if [ "$MODE" == "deploy" ]; then
   while read -r DIR; do
     if [ "$WORKFLOWS" != "true" ]; then
       planemo shed_update --shed_target "$SHED_TARGET" --shed_key "$SHED_KEY" --force_repository_creation "$DIR" || exit 1;
