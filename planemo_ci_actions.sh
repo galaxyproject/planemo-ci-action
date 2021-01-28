@@ -63,25 +63,21 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   planemo ci_find_repos $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 
-#   echo > tool_list.txt
-#   if [ "$WORKFLOWS" != "true" ]; then
+  touch tool_list.txt
+  if [ "$WORKFLOWS" != "true" ]; then
     # TODO check: run ci_find_tools on complete repo has the advantage that it can be reused in the linting step
     planemo ci_find_tools $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
     TOOLS=$(cat tool_list.txt)
     # if [ -s repository_list.txt ]; then
     #   planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
     # fi
-#   fi
-
-  cat tool_list.txt
-  wc tool_list.txt
+  fi
 
   if [ "$WORKFLOWS" != "true" ]; then
     ln -s tool_list.txt count_list.txt
   else
     ln -s repository_list.txt count_list.txt
   fi
-
 
   CHUNK_COUNT=$(wc -l < count_list.txt)
   if [ "$CHUNK_COUNT" -gt "$MAX_CHUNKS" ]; then
@@ -95,8 +91,7 @@ else
   echo "$TOOLS" > tool_list.txt
   echo "$CHUNK_COUNT" > chunk_count.txt
 fi
-cat tool_list.txt
-wc tool_list.txt
+
 # lint mode
 # - call `planemo lint` for each repo
 # - check if each tool is in a repo (i.e. if `.shed.yml` is present)
