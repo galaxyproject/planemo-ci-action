@@ -3,6 +3,9 @@ Planemo discover action
 
 Installs planemo, discovers changed workflows and tools, and allows to lint, test or deploy them.
 
+The reference use cases of this action are the [pull request](https://github.com/galaxyproject/tools-iuc/blob/master/.github/workflows/pr.yaml) and [continuous integration](https://github.com/galaxyproject/tools-iuc/blob/master/.github/workflows/ci.yaml) workflows of the [intergalactic utility comission (IUC)](https://github.com/galaxyproject/tools-iuc/).
+
+
 The action runs in one of six modes which are controled with the `mode` inputs. Possible values are:
 
 - `setup`: This is the default. 
