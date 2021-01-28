@@ -15,6 +15,9 @@ if [ "$CREATE_CACHE" != "false" ]; then
   PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --no_conda_auto_init --galaxy_source https://github.com/"$GALAXY_FORK"/galaxy --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
 fi
 
+GITHUB_EVENT_NAME=${GITHUB_EVENT_NAME_OVERRIDE:-$GITHUB_EVENT_NAME}
+GITHUB_REF=${GITHUB_REF_OVERRIDE:-$GITHUB_REF}
+
 # setup mode
 # - get commit range (for push and pull_request events) .. 
 #   not set for sheduled and repository_dispatch events
@@ -26,7 +29,7 @@ fi
 #   of tools (limited by MAX_CHUNK)
 if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   # The range of commits to check for changes is:
-  # - `origin/main...` (resp. `origin/master`) for all events happening on afeature branch
+  # - `origin/main...` (resp. `origin/master`) for all events happening on a feature branch
   # - for events on the master branch we compare against the sha before the event
   #   (note that this does not work for feature branch events since we want all
   #   commits on the feature branch and not just the commits of the last event)

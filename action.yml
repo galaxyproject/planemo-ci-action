@@ -59,6 +59,14 @@ inputs:
   workflow-namespace:
     description: 'Github namespace under which to create workfow repositories'
     default: 'iwc-workflows'
+  # inputs that are needed for testing this action
+  # not supposed to be used
+  github-event-name-override:
+    description: 'ONLY FOR TESTING: override GITHUB_EVENT_NAME'
+    default: ''
+  github-ref-override:
+    description: 'ONLY FOR TESTING: override GITHUB_REF'
+    default: ''
 
 outputs:
   commit-range:
@@ -114,6 +122,8 @@ runs:
         SETUP_CVMFS: ${{ inputs.setup-cvmfs }}
         WORKFLOW_NAMESPACE: ${{ inputs.workflow-namespace }} 
         WORKFLOWS: ${{ inputs.workflows }}
+        GITHUB_EVENT_NAME_OVERRIDE: ${{ inputs.github-event-name-override }}
+        GITHUB_REF_OVERRIDE: ${{ inputs.github-ref-override }}
 
     # see https://trstringer.com/github-actions-multiline-strings/
     - run: |
