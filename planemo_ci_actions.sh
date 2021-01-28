@@ -170,6 +170,7 @@ fi
 # - optionally generate html / markdown reports
 # - compute statistics
 if [ "$MODE" == "combine" ]; then
+  find artifacts/ -name tool_test_output.json
   # combine test reports in artifacts into a single one (upload/tool_test_output.json)
   find artifacts/ -name tool_test_output.json -exec sh -c 'planemo merge_test_reports "$@" upload/tool_test_output.json' sh {} +
   # create html and markdown reports
