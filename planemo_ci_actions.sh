@@ -73,6 +73,9 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
     # fi
   fi
 
+  cat tool_list.txt
+  wc tool_list.txt
+
   if [ "$WORKFLOWS" != "true" ]; then
     ln -s tool_list.txt count_list.txt
   else
