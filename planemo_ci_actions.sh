@@ -87,9 +87,9 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   fi
   echo $CHUNK_COUNT > chunk_count.txt
 else
-  echo "$REPOSITORIES" > repository_list.txt
-  echo "$TOOLS" > tool_list.txt
-  echo "$CHUNK_COUNT" > chunk_count.txt
+  echo -n "$REPOSITORIES" > repository_list.txt
+  echo -n "$TOOLS" > tool_list.txt
+  echo -n "$CHUNK_COUNT" > chunk_count.txt
 fi
 
 # lint mode
