@@ -143,7 +143,7 @@ if [ "$MODE" == "test" ]; then
   cat tool_list_chunk.txt
   
   # Test tools
-  mkdir json_output
+  mkdir -p json_output
   touch .tt_biocontainer_skip
   while read -r TOOL_GROUP; do
     # Check if any of the lines in .tt_biocontainer_skip is a substring of $TOOL_GROUP
