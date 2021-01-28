@@ -139,7 +139,7 @@ runs:
         TOOLS="${TOOLS//'%'/'%25'}"
         TOOLS="${TOOLS//$'\n'/'%0A'}"
         TOOLS="${TOOLS//$'\r'/'%0D'}"
-        echo "::set-output name=tool-list::$TOOLS"
+        echo "::set-output name=tool-list::$(echo "$TOOLS")"
       id: tool-list
       shell: bash
     - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
