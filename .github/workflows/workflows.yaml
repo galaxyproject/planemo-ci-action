@@ -118,8 +118,6 @@ jobs:
       run: pip install wheel
     - uses: actions/checkout@v2
       with:
-        # TODO main
-        ref: master
         fetch-depth: 1
     - name: Artificially exclude tools (because ci_find_repos discovers tool and workflow repos)
       run: echo 'test/tools/' > .tt_skip
