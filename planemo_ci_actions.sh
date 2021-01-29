@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -ex
 
-PLANEMO_TEST_OPTIONS="--database_connection $DATABASE_CONNECTION --galaxy_source https://github.com/$GALAXY_FORK/galaxy --galaxy_branch $GALAXY_BRANCH --galaxy_python_version $PYTHON_VERSION"
-PLANEMO_CONTAINER_DEPENDENCIES="--biocontainers --no_dependency_resolution --no_conda_auto_init"
-PLANEMO_WORKFLOW_OPTIONS="--shed_tool_conf /cvmfs/main.galaxyproject.org/config/shed_tool_conf.xml --no_shed_install --tool_data_table /cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml --tool_data_table /cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml --docker_extra_volume /cvmfs "
+PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION")
+PLANEMO_CONTAINER_DEPENDENCIES=("--biocontainers" "--no_dependency_resolution" "--no_conda_auto_init")
+PLANEMO_WORKFLOW_OPTIONS=("--shed_tool_conf" "/cvmfs/main.galaxyproject.org/config/shed_tool_conf.xml" "--no_shed_install" "--tool_data_table" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "--docker_extra_volume" "/cvmfs")
 # ensure that all files that are used for action outputs are present 
 mkdir -p upload
 touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statistics.txt 
@@ -56,17 +56,17 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   echo "$COMMIT_RANGE" > commit_range.txt
 
   if [ -n "$COMMIT_RANGE" ]; then
-    PLANEMO_COMMIT_RANGE="--changed_in_commit_range $COMMIT_RANGE"
+    PLANEMO_COMMIT_RANGE=("--changed_in_commit_range" "$COMMIT_RANGE")
   fi
   
   touch .tt_skip
-  planemo ci_find_repos $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
+  planemo ci_find_repos "${PLANEMO_COMMIT_RANGE[@]}" --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 
   touch tool_list.txt
   if [ "$WORKFLOWS" != "true" ]; then
     # TODO check: run ci_find_tools on complete repo has the advantage that it can be reused in the linting step
-    planemo ci_find_tools $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
+    planemo ci_find_tools "${PLANEMO_COMMIT_RANGE[@]}" --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
     TOOLS=$(cat tool_list.txt)
     # if [ -s repository_list.txt ]; then
     #   planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
@@ -127,10 +127,11 @@ if [ "$MODE" == "test" ]; then
   # Find tools for chunk
   touch tool_list_chunk.txt
   if [ -s repository_list.txt ]; then
+    mapfile -t REPO_ARRAY < repository_list.txt
     if [ "$WORKFLOWS" != "true" ]; then
-      planemo ci_find_tools --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" --group_tools --output tool_list_chunk.txt $(cat repository_list.txt)
+      planemo ci_find_tools --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" --group_tools --output tool_list_chunk.txt "${REPO_ARRAY[@]}"
     else
-      planemo ci_find_repos --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" --output tool_list_chunk.txt $(cat repository_list.txt)
+      planemo ci_find_repos --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" --output tool_list_chunk.txt "${REPO_ARRAY[@]}"
     fi 
   fi
 
@@ -140,18 +141,18 @@ if [ "$MODE" == "test" ]; then
   # Test tools
   mkdir -p json_output
   touch .tt_biocontainer_skip
-  while read -r TOOL_GROUP; do
+  while read -r -a TOOL_GROUP; do
     # Check if any of the lines in .tt_biocontainer_skip is a substring of $TOOL_GROUP
-    if echo "$TOOL_GROUP" | grep -qf .tt_biocontainer_skip; then
-      PLANEMO_OPTIONS=""
+    if echo "${TOOL_GROUP[@]}" | grep -qf .tt_biocontainer_skip; then
+      PLANEMO_OPTIONS=()
     else
-      PLANEMO_OPTIONS=$PLANEMO_CONTAINER_DEPENDENCIES
+      PLANEMO_OPTIONS=("${PLANEMO_CONTAINER_DEPENDENCIES[@]}")
     fi
     if [ "$WORKFLOWS" == "true" ]; then
-      PLANEMO_OPTIONS="$PLANEMO_OPTIONS $PLANEMO_WORKFLOW_OPTIONS"
+      PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
     fi  
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test $PLANEMO_OPTIONS $PLANEMO_TEST_OPTIONS --test_output_json "$json" "$TOOL_GROUP" || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" || true
     docker system prune --all --force --volumes || true
   done < tool_list_chunk.txt
 

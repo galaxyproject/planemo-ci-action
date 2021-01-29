@@ -118,8 +118,6 @@ jobs:
       run: pip install wheel
     - uses: actions/checkout@v2
       with:
-        # TODO main
-        ref: master
         fetch-depth: 1
     - name: Artificially exclude tools (because ci_find_repos discovers tool and workflow repos)
       run: echo 'test/tools/' > .tt_skip
@@ -245,6 +243,9 @@ jobs:
     # This job runs on Linux
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
     - uses: actions/download-artifact@v2
       with:
         path: artifacts

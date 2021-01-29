@@ -6,7 +6,7 @@ Installs planemo, discovers changed workflows and tools, and allows to lint, tes
 The reference use cases of this action are the [pull request](https://github.com/galaxyproject/tools-iuc/blob/master/.github/workflows/pr.yaml) and [continuous integration](https://github.com/galaxyproject/tools-iuc/blob/master/.github/workflows/ci.yaml) workflows of the [intergalactic utility comission (IUC)](https://github.com/galaxyproject/tools-iuc/).
 
 
-The action runs in one of six modes which are controled with the `mode` inputs. Possible values are:
+The action runs in one of six modes which are controled with the `mode` input. Possible values are:
 
 - `setup`: This is the default. 
   - Optionally do a fake `planemo test` run to fill `.cache/pip`  and `.planemo` for caching.
@@ -16,13 +16,13 @@ The action runs in one of six modes which are controled with the `mode` inputs. 
 - `lint`: Lint tools with `planemo shed_lint` (resp. workflows with `planemo workflow_lint`) and check presence of repository metadata files (`.shed.yml`).
 - `test`: Test tools or workflows with `planemo test`.
 - `combine`: Combine the outputs from individual tool tests (`planemo merge_test_reports`) and create html/markdown reports (`planemo test_reports`).
-- `check`: Check if any of the tests failed.
+- `check`: Check if any of the tool tests failed.
 - `deploy`: Deploy tools to a toolshed using `planemo shed_update` and workflows to a github namespace, resp.
 
-If none of these inputs is set then a setup mode runs.
+If none of these modes is set then a setup mode runs.
 
 In all modes required software will be installed automatically, i.e. `planemo` and `jq`. 
-The version of planemo can be controlled with the input `planemo-version` (default `"planemo"`).
+The version of planemo can be controlled with the input `planemo-version` (default `"planemo"`, i.e. the latest version).
 
 Assumptions
 -----------
@@ -47,10 +47,11 @@ Setup mode
 
 This mode runs if no other mode is selected. It:
 
-- runs `planemo test` on a mock tool (if `create-cache` is set to true)
-- determines the relevant set or repositories and tools with `planemo ci_find_repos` and `planemo ci_find_tools`, respectively.
-  - for push and pull_request events (using `GITHUB_EVENT_NAME`) tools and repos that changed in the commit range
-  - all tools and repos otherwise
+- runs `planemo test` on a mock tool (if `create-cache` is set to `true`)
+- determines the relevant set of tool/workflow repositories and tools with `planemo ci_find_repos` and `planemo ci_find_tools`, respectively.
+  - for push and pull_request events (using `GITHUB_EVENT_NAME`) tools and repositories that changed in the commit range
+  - all tools and repositories otherwise
+
 - calulates the number of chunks to use for tool testing and the
   list of chunks
 
@@ -66,7 +67,7 @@ Optional inputs:
 Outputs:
 
 - `commit-range`: The used commit range.
-- `tool-list`: List of tools.
+- `tool-list`: List of tools (empty if `workflows` is `true`).
 - `repository-list` List of repositories.
 - `chunk-count`: Number of chunks to use.
 - `chunk-list`: List of chunks
@@ -86,7 +87,7 @@ Test mode
 
 Runs `planemo test` for each tool in a chunk using `ci_find_tools`. Note that none of the tests
 will produce a non-zero exit code even if the tests fail. Success needs to be checked with the
-"check outputs" mode after combining the outputs of the chunks.
+`check` mode after combining the outputs of the chunks.
 
 Inputs:
 
@@ -134,7 +135,7 @@ Check the combined outputs for failed test runs. If a failed test is found exit 
 
 Input:
 
-`upload/tool_test_output.json`
+tool test results in `upload/tool_test_output.json`
 
 Output:
 
