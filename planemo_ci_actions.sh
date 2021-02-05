@@ -193,11 +193,13 @@ fi
 
 # deploy mode
 if [ "$MODE" == "deploy" ]; then
-  while read -r DIR; do
+  mapfile -t REPO_ARRAY < repository_list.txt
+  for DIR in "${REPO_ARRAY[@]}"
+  do
     if [ "$WORKFLOWS" != "true" ]; then
       planemo shed_update --shed_target "$SHED_TARGET" --shed_key "$SHED_KEY" --force_repository_creation "$DIR" || exit 1;
     else
       planemo workflow_upload --namespace "$WORKFLOW_NAMESPACE" "$DIR" || exit 1;
     fi
-   done < repository_list.txt
+  done
 fi
