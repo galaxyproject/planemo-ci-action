@@ -59,6 +59,9 @@ inputs:
   workflow-namespace:
     description: 'Github namespace under which to create workfow repositories'
     default: 'iwc-workflows'
+  github-token:
+    description: '(Secret!) Github PAT token. Needed for creating workflow repositories with workflow-upload'
+    default: ''
   # inputs that are needed for testing this action
   # not supposed to be used
   github-event-name-override:
@@ -120,7 +123,8 @@ runs:
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
         SETUP_CVMFS: ${{ inputs.setup-cvmfs }}
-        WORKFLOW_NAMESPACE: ${{ inputs.workflow-namespace }} 
+        WORKFLOW_NAMESPACE: ${{ inputs.workflow-namespace }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
         WORKFLOWS: ${{ inputs.workflows }}
         GITHUB_EVENT_NAME_OVERRIDE: ${{ inputs.github-event-name-override }}
         GITHUB_REF_OVERRIDE: ${{ inputs.github-ref-override }}
