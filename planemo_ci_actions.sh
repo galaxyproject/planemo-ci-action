@@ -65,16 +65,22 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
 
   touch tool_list.txt
   if [ "$WORKFLOWS" != "true" ]; then
-    # TODO check: run ci_find_tools on complete repo has the advantage that it can be reused in the linting step
     planemo ci_find_tools "${PLANEMO_COMMIT_RANGE[@]}" --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
     TOOLS=$(cat tool_list.txt)
-    # if [ -s repository_list.txt ]; then
-    #   planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
-    # fi
   fi
 
+  # determine the number of chunks to use as linear function of the number of
+  # tested tools (i.e. all tools in the changed repos)
   if [ "$WORKFLOWS" != "true" ]; then
-    ln -s tool_list.txt count_list.txt
+    if [ -s repository_list.txt ]; then
+      if [ -n "$COMMIT_RANGE" ]; then
+        mapfile -t REPO_ARRAY < repository_list.txt
+        planemo ci_find_tools --output count_list.txt "${REPO_ARRAY[@]}" 
+      else
+        ln -s tool_list.txt count_list.txt
+      fi
+    fi
+    touch count_list.txt
   else
     ln -s repository_list.txt count_list.txt
   fi
