@@ -82,6 +82,10 @@ Inputs (all of them required):
 - `repository-list` 
 - `tool-list`
 
+Output:
+
+- creates a file `lint_report.txt`
+
 Test mode
 ---------
 
