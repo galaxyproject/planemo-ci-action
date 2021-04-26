@@ -128,6 +128,13 @@ fi
 # - merge the test reports for the tool groups
 if [ "$MODE" == "test" ]; then
 
+  # set a random date. ofen tools put time stamps in output files
+  # for tools undergoing short reviews (<1d) these will produce
+  # problems with weekly checks that may be avoided by this
+  rand=$(echo "$RANDOM * $RANDOM * $RANDOM / 1000" | bc -l)
+  randdate=$(date -d "$rand" +%Y%m%d %H:%M)
+  sudo date -s "$randdate"
+
   if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
     "$GITHUB_ACTION_PATH"/cvmfs/setup_cvmfs.sh
   fi
