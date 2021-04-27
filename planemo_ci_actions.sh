@@ -133,7 +133,7 @@ if [ "$MODE" == "test" ]; then
   # problems with weekly checks that may be avoided by this
   rand=$(echo "$RANDOM * $RANDOM * $RANDOM / 1000" | bc -l | sed 's/\..*$//')
   randdate=$(date -d "@$rand" "+%Y%m%d %H:%M")
-  echo $randdate
+  echo "$randdate"
   sudo date -s "$randdate"
 
   if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
