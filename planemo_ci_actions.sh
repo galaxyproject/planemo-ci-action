@@ -131,8 +131,9 @@ if [ "$MODE" == "test" ]; then
   # set a random date. ofen tools put time stamps in output files
   # for tools undergoing short reviews (<1d) these will produce
   # problems with weekly checks that may be avoided by this
-  rand=$(echo "$RANDOM * $RANDOM * $RANDOM / 1000" | bc -l | sed 's/\..*$//')
-  randdate=$(date -d "@$rand" "+%Y%m%d %H:%M")
+  # rand=$(echo "$RANDOM * $RANDOM * $RANDOM / 1000" | bc -l | sed 's/\..*$//')
+  # randdate=$(date -d "@$rand" "+%Y%m%d %H:%M")
+  randdate=$(date -d "-1 day +1 hour -1 minute" "+%Y%m%d %H:%M")
   echo "$randdate"
   sudo date -s "$randdate"
 
