@@ -136,6 +136,7 @@ if [ "$MODE" == "test" ]; then
   randdate=$(date -d "-1 day +1 hour -1 minute" "+%Y-%m-%d %H:%M:%S")
   echo "$randdate"
   # sudo date -s "$randdate"
+  sudo timedatectl set-ntp 0
   sudo timedatectl set-time "$randdate"
 
   if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
