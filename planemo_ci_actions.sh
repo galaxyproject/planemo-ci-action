@@ -133,9 +133,10 @@ if [ "$MODE" == "test" ]; then
   # problems with weekly checks that may be avoided by this
   # rand=$(echo "$RANDOM * $RANDOM * $RANDOM / 1000" | bc -l | sed 's/\..*$//')
   # randdate=$(date -d "@$rand" "+%Y%m%d %H:%M")
-  randdate=$(date -d "-1 day +1 hour -1 minute" "+%Y%m%d %H:%M")
+  randdate=$(date -d "-1 day +1 hour -1 minute" "+%Y-%m-%d %H:%M:%S")
   echo "$randdate"
-  sudo date -s "$randdate"
+  # sudo date -s "$randdate"
+  sudo timedatectl set-time "$randdate"
 
   if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
     "$GITHUB_ACTION_PATH"/cvmfs/setup_cvmfs.sh
