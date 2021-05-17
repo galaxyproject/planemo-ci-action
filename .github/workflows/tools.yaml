@@ -177,8 +177,8 @@ jobs:
         mode: lint
         repository-list: ${{ needs.setup-ci-tools.outputs.repository-list }}
         tool-list: ${{ needs.setup-ci-tools.outputs.tool-list }}
+      continue-on-error: true
     - name: check if all test tools were linted
-      if: ${{ always() }}
       run: |
         grep tool1 lint_report.txt
         grep tool2 lint_report.txt
