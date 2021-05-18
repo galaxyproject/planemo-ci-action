@@ -182,7 +182,7 @@ jobs:
       run: |
         grep tool1 lint_report.txt
         grep tool2 lint_report.txt
-        grep "ERROR: Error '404 Client Error:" lint_report.txt
+        grep "ERROR: Error 'HTTPConnectionPool" lint_report.txt
 
   test-tools:
     name: Test testing of tools
