@@ -8,7 +8,6 @@ env:
   MAX_CHUNKS: 4
 
 jobs:
-
   setup-pr-tools:
     name: Setup as in PR for tools
     runs-on: ubuntu-latest
