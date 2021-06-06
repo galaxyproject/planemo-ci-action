@@ -8,7 +8,6 @@ env:
   MAX_CHUNKS: 4
 
 jobs:
-
   setup-pr-tools:
     name: Setup as in PR for tools
     runs-on: ubuntu-latest
@@ -177,11 +176,12 @@ jobs:
         mode: lint
         repository-list: ${{ needs.setup-ci-tools.outputs.repository-list }}
         tool-list: ${{ needs.setup-ci-tools.outputs.tool-list }}
+      continue-on-error: true
     - name: check if all test tools were linted
       run: |
         grep tool1 lint_report.txt
         grep tool2 lint_report.txt
-      
+        grep "ERROR: Error 'HTTPConnectionPool" lint_report.txt
 
   test-tools:
     name: Test testing of tools
