@@ -1,4 +1,4 @@
-Planemo discover action
+Planemo CI action
 =======================
 
 Installs planemo, discovers changed workflows and tools, and allows to lint, test or deploy them.
