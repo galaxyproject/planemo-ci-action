@@ -82,6 +82,10 @@ Inputs (all of them required):
 - `repository-list` 
 - `tool-list`
 
+Optional inputs: 
+
+- `planemo-options`: additional options passed to `planemo lint`
+
 Output:
 
 - creates a file `lint_report.txt`
@@ -107,6 +111,7 @@ Optional inputs:
 - `galaxy-branch`
 - `galaxy-source`
 - `python-version`
+- `planemo-options`: additional options passed to `planemo test`
 
 Output:
 

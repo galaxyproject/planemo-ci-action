@@ -105,9 +105,9 @@ if [ "$MODE" == "lint" ]; then
   mapfile -t REPO_ARRAY < repository_list.txt
   for DIR in "${REPO_ARRAY[@]}"; do
     if [ "$WORKFLOWS" != "true" ]; then
-      planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR" | tee -a lint_report.txt
+      planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR" $PLANEMO_OPTIONS | tee -a lint_report.txt
     else
-      planemo workflow_lint --fail_level error "$DIR" | tee -a lint_report.txt
+      planemo workflow_lint --fail_level error "$DIR" $PLANEMO_OPTIONS | tee -a lint_report.txt
     fi
   done
 
@@ -160,7 +160,7 @@ if [ "$MODE" == "test" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
     fi  
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" $PLANEMO_OPTIONS || true
     docker system prune --all --force --volumes || true
   done < tool_list_chunk.txt
 
