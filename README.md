@@ -77,7 +77,7 @@ Lint mode
 
 Calls `planemo shed_lint` for each repository and checks if each tool is in a repository (i.e. metadata like `.shed.yml` is present).
 
-Inputs (all of them required):
+Required inputs:
 
 - `repository-list` 
 - `tool-list`
@@ -97,7 +97,7 @@ Runs `planemo test` for each tool in a chunk using `ci_find_tools`. Note that no
 will produce a non-zero exit code even if the tests fail. Success needs to be checked with the
 `check` mode after combining the outputs of the chunks.
 
-Inputs:
+Required Inputs:
 
 - `repository-list`: List of repositories
 - `workflows`: test workflows
@@ -122,7 +122,7 @@ Combine test outputs mode
 
 Combines the test result of the chunked tests and create html or markdown reports.
 
-Input: 
+Required input: 
 
 - json files need to be placed in a directory `artifacts/`.
 
@@ -142,7 +142,7 @@ Test combined outputs mode
 
 Check the combined outputs for failed test runs. If a failed test is found exit code 1 is returned.
 
-Input:
+Required input:
 
 tool test results in `upload/tool_test_output.json`
 
@@ -155,7 +155,7 @@ Deploy mode
 
 Deploy all repositories to a toolshed.
 
-Inputs:
+Required inputs:
 
 - `workflows`: deploy workflows to github namespace
 - `workflow-namespace`
