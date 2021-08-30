@@ -4,6 +4,9 @@ set -exo pipefail
 PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION")
 PLANEMO_CONTAINER_DEPENDENCIES=("--biocontainers" "--no_dependency_resolution" "--no_conda_auto_init")
 PLANEMO_WORKFLOW_OPTIONS=("--shed_tool_conf" "/cvmfs/main.galaxyproject.org/config/shed_tool_conf.xml" "--no_shed_install" "--tool_data_table" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "--docker_extra_volume" "/cvmfs")
+read -a -r ADDITIONAL_PLANEMO_OPTIONS <<< "$ADDITIONAL_PLANEMO_OPTIONS"
+
+
 # ensure that all files that are used for action outputs are present 
 mkdir -p upload
 touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statistics.txt 
@@ -105,9 +108,9 @@ if [ "$MODE" == "lint" ]; then
   mapfile -t REPO_ARRAY < repository_list.txt
   for DIR in "${REPO_ARRAY[@]}"; do
     if [ "$WORKFLOWS" != "true" ]; then
-      planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR" $ADDITIONAL_PLANEMO_OPTIONS | tee -a lint_report.txt
+      planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt
     else
-      planemo workflow_lint --fail_level error "$DIR" $ADDITIONAL_PLANEMO_OPTIONS | tee -a lint_report.txt
+      planemo workflow_lint --fail_level error "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt
     fi
   done
 
@@ -160,7 +163,7 @@ if [ "$MODE" == "test" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
     fi  
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" $ADDITIONAL_PLANEMO_OPTIONS || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
     docker system prune --all --force --volumes || true
   done < tool_list_chunk.txt
 
