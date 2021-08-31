@@ -131,7 +131,7 @@ runs:
         WORKFLOWS: ${{ inputs.workflows }}
         GITHUB_EVENT_NAME_OVERRIDE: ${{ inputs.github-event-name-override }}
         GITHUB_REF_OVERRIDE: ${{ inputs.github-ref-override }}
-        ADDITIONAL_PLANEMO_OPTIONS: ${{ inputs.additional-planemo-option }}
+        ADDITIONAL_PLANEMO_OPTIONS: ${{ inputs.additional-planemo-options }}
 
     # see https://trstringer.com/github-actions-multiline-strings/
     - run: |

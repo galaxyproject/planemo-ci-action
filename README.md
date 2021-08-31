@@ -84,7 +84,7 @@ Required inputs:
 
 Optional inputs: 
 
-- `planemo-options`: additional options passed to `planemo lint`
+- `additional-planemo-options`: additional options passed to `planemo lint`
 
 Output:
 
@@ -97,7 +97,7 @@ Runs `planemo test` for each tool in a chunk using `ci_find_tools`. Note that no
 will produce a non-zero exit code even if the tests fail. Success needs to be checked with the
 `check` mode after combining the outputs of the chunks.
 
-Required Inputs:
+Required inputs:
 
 - `repository-list`: List of repositories
 - `workflows`: test workflows
@@ -111,7 +111,7 @@ Optional inputs:
 - `galaxy-branch`
 - `galaxy-source`
 - `python-version`
-- `planemo-options`: additional options passed to `planemo test`
+- `additional-planemo-options`: additional options passed to `planemo test`
 
 Output:
 
