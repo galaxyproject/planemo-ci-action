@@ -85,11 +85,15 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
     ln -s repository_list.txt count_list.txt
   fi
 
-  CHUNK_COUNT=$(wc -l < count_list.txt)
-  if [ "$CHUNK_COUNT" -gt "$MAX_CHUNKS" ]; then
-    CHUNK_COUNT=$MAX_CHUNKS
-  elif [ "$CHUNK_COUNT" -eq 0 ]; then
+  if [ "$UPDATE_TEST_DATA" == "true" ]; then
     CHUNK_COUNT=1
+  else
+    CHUNK_COUNT=$(wc -l < count_list.txt)
+    if [ "$CHUNK_COUNT" -gt "$MAX_CHUNKS" ]; then
+      CHUNK_COUNT=$MAX_CHUNKS
+    elif [ "$CHUNK_COUNT" -eq 0 ]; then
+      CHUNK_COUNT=1
+    fi
   fi
   echo $CHUNK_COUNT > chunk_count.txt
 else
@@ -158,7 +162,10 @@ if [ "$MODE" == "test" ]; then
     fi
     if [ "$WORKFLOWS" == "true" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
-    fi  
+    fi
+    if [ "$UPDATE_TEST_DATA" == "true" ]; then
+      PLANEMO_OPTIONS+=("--update-test-data")
+    fi
     json=$(mktemp -u -p json_output --suff .json)
     PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" || true
     docker system prune --all --force --volumes || true
