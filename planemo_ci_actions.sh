@@ -39,7 +39,13 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   if [ "$GITHUB_EVENT_NAME" =  "push" ]; then
     case "$GITHUB_REF" in
       refs/heads/master|refs/heads/main )
-      COMMIT_RANGE="$EVENT_BEFORE.."
+      # the initial commit leads to an error `invalid commit range`
+      # so we don't set it explicitly which leads to the equivalent
+      # behaviour, i.e. testing the complete repo which is fine for
+      # the initial commit which contains only an example tool
+      if [ "$EVENT_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+        COMMIT_RANGE="$EVENT_BEFORE.."
+      fi
       ;;
       *)
       if git fetch origin main; then
