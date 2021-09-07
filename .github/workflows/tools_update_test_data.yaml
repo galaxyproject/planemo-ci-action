@@ -55,8 +55,8 @@ jobs:
       run: |
         git config --global user.name "Arthur Dent"
         git config --global user.email "a.dent@galaxyproject.org"
-        sed -i -e 's/echo test/echo WRONG_TEST_DATA/' test/tools/tool1/tool1.xml
-        sed -i -e 's/echo test/echo WRONG_TEST_DATA/' test/tools/tool2/tool2.xml
+        sed -i -e 's/echo test/echo updated/' test/tools/tool1/tool1.xml
+        sed -i -e 's/echo test/echo updated/' test/tools/tool2/tool2.xml
         git commit -m bump test/tools/
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
       uses: ./
@@ -119,8 +119,8 @@ jobs:
         key: cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
     - name: Introduce a change on test tool1 and 2
       run: |
-        sed -i -e 's/echo test/echo WRONG_TEST_DATA/' test/tools/tool1/tool1.xml
-        sed -i -e 's/echo test/echo WRONG_TEST_DATA/' test/tools/tool2/tool2.xml
+        sed -i -e 's/echo test/echo updated/' test/tools/tool1/tool1.xml
+        sed -i -e 's/echo test/echo updated/' test/tools/tool2/tool2.xml
     - name: Planemo test tools
       uses: ./
       id: test-tools
@@ -132,14 +132,9 @@ jobs:
         chunk: ${{ matrix.chunk }}
         chunk-count: ${{ needs.setup-pr-tools.outputs.chunk-count }}
         update-test-data: true
-    - name: Check if test created the test data
+    - name: Check if test updated the test data
       run: |
-        if [ ! -d test/tools/tool1/test-data ]; then
-          echo "test data for tool1 has not been created"; exit 1;
-        fi
-        if [ ! -d test/tools/tool2/test-data ]; then
-          echo "test data for tool2 has not been created"; exit 1;
-        fi
+        if ! grep -q "updated" test/tools/tool1/test-data/test.txt; then echo "test data for tool1 has not been updated"; exit 1; fi
     - uses: actions/upload-artifact@v2
       with:
         name: 'Tool test output ${{ matrix.chunk }}'
