@@ -43,7 +43,7 @@ jobs:
         path: |
           ~/.cache/pip
           ~/.planemo
-        key: cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
+        key: cache_py_${{ matrix.python-version }}_gxy_${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
     # Install the `wheel` package so that when installing other packages which
     # are not available as wheels, pip will build a wheel for them, which can be cached.
     - name: Install wheel
