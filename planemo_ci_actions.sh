@@ -164,7 +164,7 @@ if [ "$MODE" == "test" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
     fi
     if [ "$UPDATE_TEST_DATA" == "true" ]; then
-      PLANEMO_OPTIONS+=("--update-test-data")
+      PLANEMO_OPTIONS+=("--update_test_data")
     fi
     json=$(mktemp -u -p json_output --suff .json)
     PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" || true
