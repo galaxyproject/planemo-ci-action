@@ -59,8 +59,8 @@ jobs:
       run: |
         git config --global user.name "Arthur Dent"
         git config --global user.email "a.dent@galaxyproject.org"
-        echo "" >> test/tools/tool1/tool1.xml
-        echo "" >> test/tools/tool2/tool2.xml
+        sed -i -e 's/echo test/echo WRONG_TEST_DATA/' test/tools/tool1/tool1.xml
+        sed -i -e 's/echo test/echo WRONG_TEST_DATA/' test/tools/tool2/tool2.xml
         git commit -m bump test/tools/
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
       uses: ./
@@ -119,6 +119,10 @@ jobs:
       with:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
+    - name: Introduce a change on test tool1 and 2
+      run: |
+        sed -i -e 's/echo test/echo WRONG_TEST_DATA/' test/tools/tool1/tool1.xml
+        sed -i -e 's/echo test/echo WRONG_TEST_DATA/' test/tools/tool2/tool2.xml
     - name: Planemo test tools
       uses: ./
       id: test-tools
