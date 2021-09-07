@@ -16,11 +16,7 @@
     <tests>
         <test>
             <param name="bool" value="true"/>
-            <output name="out">
-                <assert_contents>
-                    <has_text text="test"/>
-                </assert_contents>
-            </output>
+            <output name="out" value="test.txt"/>
         </test>
     </tests>
     <help><![CDATA[
