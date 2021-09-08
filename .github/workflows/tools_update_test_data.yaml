@@ -1,0 +1,141 @@
+on: [push, pull_request]
+
+name: 'Test action for tools with update test data'
+
+env:
+  GALAXY_FORK: galaxyproject
+  GALAXY_BRANCH: master
+  MAX_CHUNKS: 4
+
+jobs:
+  setup-pr-tools:
+    name: Setup as in PR for tools
+    runs-on: ubuntu-latest
+    outputs:
+      galaxy-head-sha: ${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
+      repository-list: ${{ steps.discover.outputs.repository-list }}
+      tool-list: ${{ steps.discover.outputs.tool-list }}
+      chunk-count: ${{ steps.discover.outputs.chunk-count }}
+      chunk-list: ${{ steps.discover.outputs.chunk-list }}
+    strategy:
+      matrix:
+        python-version: [3.7]
+    steps:
+    - name: Print github context properties
+      run: |
+        echo 'event: ${{ github.event_name }}'
+        echo 'sha: ${{ github.sha }}'
+        echo 'ref: ${{ github.ref }}'
+        echo 'head_ref: ${{ github.head_ref }}'
+        echo 'base_ref: ${{ github.base_ref }}'
+        echo 'event.before: ${{ github.event.before }}'
+        echo 'event.after: ${{ github.event.after }}'
+    - name: Determine latest commit in the Galaxy repo
+      id: get-galaxy-sha
+      run: echo "::set-output name=galaxy-head-sha::$(git ls-remote https://github.com/${{ env.GALAXY_FORK }}/galaxy refs/heads/${{ env.GALAXY_BRANCH }} | cut -f1)"
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache .cache/pip and .planemo
+      uses: actions/cache@v2
+      id: cache-pip-planemo
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.planemo
+        key: cache_py_${{ matrix.python-version }}_gxy_${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
+    # Install the `wheel` package so that when installing other packages which
+    # are not available as wheels, pip will build a wheel for them, which can be cached.
+    - name: Install wheel
+      run: pip install wheel
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Introduce a change on test tool1 and 2
+      run: |
+        git config --global user.name "Arthur Dent"
+        git config --global user.email "a.dent@galaxyproject.org"
+        sed -i -e 's/echo test/echo updated/' test/tools/tool1/tool1.xml
+        sed -i -e 's/echo test/echo updated/' test/tools/tool2/tool2.xml
+        git commit -m bump test/tools/
+    - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
+      uses: ./
+      id: discover
+      with:
+        create-cache: ${{ steps.cache-pip.outputs.cache-hit != 'true' || steps.cache-planemo.outputs.cache-hit != 'true' }}
+        galaxy-fork: ${{ env.GALAXY_FORK }}
+        galaxy-branch: ${{ env.GALAXY_BRANCH }}
+        max-chunks: ${{ env.MAX_CHUNKS }}
+        python-version: ${{ matrix.python-version }}
+        update-test-data: true
+    - name: Check commit range
+      run: if ! grep "\.\." <<<$(echo ${{ steps.discover.outputs.commit-range }}); then echo "wrong commit range"; exit 1; fi
+    - name: Check content of repository list
+      run: |
+        if ! grep -q "tool1" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then echo "tool1 must be in repo list"; exit 1; fi
+        if ! grep -q "tool2" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then echo "tool2 must be in repo list"; exit 1; fi
+    - name: Check content of tool list
+      run: |
+        if ! grep -q "tool1.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then echo "tool1.xml must be in tool list"; exit 1; fi
+        if ! grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then echo "tool2.xml must be in tool list"; exit 1; fi
+    - name: Check number of chunks
+      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then echo "wrong chunk-count"; exit 1; fi
+
+
+  test-tools:
+    name: Test testing of tools
+    needs: [setup-pr-tools]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: ${{ fromJson(needs.setup-pr-tools.outputs.chunk-list) }}
+        python-version: [3.7]
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+    steps:
+    # checkout the repository
+    # and use it as the current working directory
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache .cache/pip and .planemo
+      uses: actions/cache@v2
+      id: cache-pip-planemo
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.planemo
+        key: cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
+    - name: Introduce a change on test tool1 and 2
+      run: |
+        sed -i -e 's/echo test/echo updated/' test/tools/tool1/tool1.xml
+        sed -i -e 's/echo test/echo updated/' test/tools/tool2/tool2.xml
+    - name: Planemo test tools
+      uses: ./
+      id: test-tools
+      with:
+        mode: test
+        repository-list: ${{ needs.setup-pr-tools.outputs.repository-list }}
+        galaxy-fork: ${{ env.GALAXY_FORK }}
+        galaxy-branch: ${{ env.GALAXY_BRANCH }}
+        chunk: ${{ matrix.chunk }}
+        chunk-count: ${{ needs.setup-pr-tools.outputs.chunk-count }}
+        update-test-data: true
+    - name: Check if test updated the test data
+      run: |
+        if ! grep -q "updated" test/tools/tool1/test-data/test.txt; then echo "test data for tool1 has not been updated"; exit 1; fi
+    - uses: actions/upload-artifact@v2
+      with:
+        name: 'Tool test output ${{ matrix.chunk }}'
+        path: upload

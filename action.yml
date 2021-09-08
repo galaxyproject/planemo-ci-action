@@ -59,6 +59,9 @@ inputs:
   workflow-namespace:
     description: 'Github namespace under which to create workfow repositories'
     default: 'iwc-workflows'
+  update-test-data:
+    description: 'Flag to trigger update of test data for test mode'
+    default: false
   github-token:
     description: '(Secret!) Github PAT token. Needed for creating workflow repositories with workflow-upload'
     default: ''
@@ -126,6 +129,7 @@ runs:
         WORKFLOW_NAMESPACE: ${{ inputs.workflow-namespace }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
         WORKFLOWS: ${{ inputs.workflows }}
+        UPDATE_TEST_DATA: ${{ inputs.update-test-data }}
         GITHUB_EVENT_NAME_OVERRIDE: ${{ inputs.github-event-name-override }}
         GITHUB_REF_OVERRIDE: ${{ inputs.github-ref-override }}
 

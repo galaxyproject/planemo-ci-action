@@ -63,6 +63,7 @@ Optional inputs:
 - `galaxy-source` (default `galaxyproject`)
 - `max-chunks` (default `20`)
 - `python-version` (default `"3.7"`)
+- `update-test-data` Boolean that sets the number of chunks to one. See documentation in test mode.
 
 Outputs:
 
@@ -107,6 +108,7 @@ Optional inputs:
 - `galaxy-branch`
 - `galaxy-source`
 - `python-version`
+- `update-test-data` Boolean that triggers the update of test data for failed tests. If you intend to commit the changes during IUC style CI the also set this in setup mode (which will set the number of chunks to 1).
 
 Output:
 
