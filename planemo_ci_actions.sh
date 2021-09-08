@@ -50,7 +50,7 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
       fi
       ;;
     esac
-  elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+  elif [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ "$GITHUB_EVENT_NAME" = "repository_dispatch" ]; then
     COMMIT_RANGE="HEAD~.."
   fi
   echo "$COMMIT_RANGE" > commit_range.txt
