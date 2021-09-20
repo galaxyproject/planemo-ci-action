@@ -82,6 +82,11 @@ Inputs (all of them required):
 - `repository-list` 
 - `tool-list`
 
+Optional inputs: 
+
+- `report_level`: all|warn|error (default: all)
+- `fail_level`: warn|error (default: warn)
+
 Output:
 
 - creates a file `lint_report.txt`

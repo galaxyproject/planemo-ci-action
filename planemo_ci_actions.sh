@@ -105,9 +105,9 @@ if [ "$MODE" == "lint" ]; then
   mapfile -t REPO_ARRAY < repository_list.txt
   for DIR in "${REPO_ARRAY[@]}"; do
     if [ "$WORKFLOWS" != "true" ]; then
-      planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR" | tee -a lint_report.txt
+      planemo shed_lint --tools --ensure_metadata --urls --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" | tee -a lint_report.txt
     else
-      planemo workflow_lint --fail_level error "$DIR" | tee -a lint_report.txt
+      planemo workflow_lint --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" "$DIR" | tee -a lint_report.txt
     fi
   done
 

@@ -50,6 +50,12 @@ inputs:
   shed-key:
     description: '(Secret!) tool shed api key'
     default: 'toolshed'
+  report-level:
+    description: "Planemo lint report level"
+    default: "all"
+  fail-level:
+    description: "Planemo lint fail level"
+    default: 'warn'
   setup-cvmfs:
     description: "Setup CVMFS mount for main.galaxyproject.org and data.galaxyproject.org"
     default: false
@@ -121,7 +127,8 @@ runs:
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
-        SHED_KEY: ${{ inputs.shed-key }}
+        REPORT_LEVEL: ${{ inputs.report-level }}
+        FAIL_LEVEL: ${{ inputs.fail-level }}
         SETUP_CVMFS: ${{ inputs.setup-cvmfs }}
         WORKFLOW_NAMESPACE: ${{ inputs.workflow-namespace }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
