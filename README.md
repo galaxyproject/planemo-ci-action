@@ -85,7 +85,7 @@ Inputs (all of them required):
 Optional inputs: 
 
 - `report_level`: all|warn|error (default: all)
-- `fail_level`: warn|error (default: warn)
+- `fail_level`: warn|error (default: error)
 
 Output:
 

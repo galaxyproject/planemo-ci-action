@@ -55,7 +55,7 @@ inputs:
     default: "all"
   fail-level:
     description: "Planemo lint fail level"
-    default: 'warn'
+    default: 'error'
   setup-cvmfs:
     description: "Setup CVMFS mount for main.galaxyproject.org and data.galaxyproject.org"
     default: false
