@@ -84,7 +84,7 @@ Required inputs:
 
 Optional inputs: 
 
-- `additional-planemo-options`: additional options passed to `planemo lint`
+- `additional-planemo-options`: additional options passed to `planemo lint`. [Here](https://github.com/galaxyproject/planemo-ci-action/blob/b8ede8dc7767a86ac8bae582554d18ea00863259/.github/workflows/tools.yaml#L179) this is used to overwrite the warn level of `planemo lint`. 
 
 Output:
 
@@ -111,7 +111,7 @@ Optional inputs:
 - `galaxy-branch`
 - `galaxy-source`
 - `python-version`
-- `additional-planemo-options`: additional options passed to `planemo test`
+- `additional-planemo-options`: additional options passed to `planemo test`, see for instance [here](https://github.com/galaxyproject/planemo-ci-action/blob/657582777416fc51b6171961d90dced7dacbeea2/.github/workflows/tools.yaml#L229)
 
 Output:
 
