@@ -62,6 +62,9 @@ inputs:
   github-token:
     description: '(Secret!) Github PAT token. Needed for creating workflow repositories with workflow-upload'
     default: ''
+  additional-planemo-options:
+    description: 'Additional options passed to planemo in lint/test mode'
+    default: ''
   # inputs that are needed for testing this action
   # not supposed to be used
   github-event-name-override:
@@ -128,6 +131,7 @@ runs:
         WORKFLOWS: ${{ inputs.workflows }}
         GITHUB_EVENT_NAME_OVERRIDE: ${{ inputs.github-event-name-override }}
         GITHUB_REF_OVERRIDE: ${{ inputs.github-ref-override }}
+        ADDITIONAL_PLANEMO_OPTIONS: ${{ inputs.additional-planemo-options }}
 
     # see https://trstringer.com/github-actions-multiline-strings/
     - run: |
