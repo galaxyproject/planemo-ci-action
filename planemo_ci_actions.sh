@@ -4,6 +4,9 @@ set -exo pipefail
 PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION")
 PLANEMO_CONTAINER_DEPENDENCIES=("--biocontainers" "--no_dependency_resolution" "--no_conda_auto_init")
 PLANEMO_WORKFLOW_OPTIONS=("--shed_tool_conf" "/cvmfs/main.galaxyproject.org/config/shed_tool_conf.xml" "--no_shed_install" "--tool_data_table" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "--docker_extra_volume" "/cvmfs")
+read -ra ADDITIONAL_PLANEMO_OPTIONS <<< "$ADDITIONAL_PLANEMO_OPTIONS"
+
+
 # ensure that all files that are used for action outputs are present 
 mkdir -p upload
 touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statistics.txt 
@@ -39,7 +42,13 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   if [ "$GITHUB_EVENT_NAME" =  "push" ]; then
     case "$GITHUB_REF" in
       refs/heads/master|refs/heads/main )
-      COMMIT_RANGE="$EVENT_BEFORE.."
+      # the initial commit leads to an error `invalid commit range`
+      # so we don't set it explicitly which leads to the equivalent
+      # behaviour, i.e. testing the complete repo which is fine for
+      # the initial commit which contains only an example tool
+      if [ "$EVENT_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+        COMMIT_RANGE="$EVENT_BEFORE.."
+      fi
       ;;
       *)
       if git fetch origin main; then
@@ -105,9 +114,9 @@ if [ "$MODE" == "lint" ]; then
   mapfile -t REPO_ARRAY < repository_list.txt
   for DIR in "${REPO_ARRAY[@]}"; do
     if [ "$WORKFLOWS" != "true" ]; then
-      planemo shed_lint --tools --ensure_metadata --urls --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" | tee -a lint_report.txt
+      planemo shed_lint --tools --ensure_metadata --urls --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt
     else
-      planemo workflow_lint --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" "$DIR" | tee -a lint_report.txt
+      planemo workflow_lint --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt
     fi
   done
 
@@ -160,7 +169,7 @@ if [ "$MODE" == "test" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
     fi  
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
     docker system prune --all --force --volumes || true
   done < tool_list_chunk.txt
 

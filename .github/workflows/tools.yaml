@@ -178,13 +178,14 @@ jobs:
         fail-level: error
         repository-list: ${{ needs.setup-ci-tools.outputs.repository-list }}
         tool-list: ${{ needs.setup-ci-tools.outputs.tool-list }}
+        additional-planemo-options: --report_level all
       continue-on-error: true
     - name: check if all test tools were linted
       run: |
         grep tool1 lint_report.txt
         grep tool2 lint_report.txt
         grep "ERROR: Error 'HTTPConnectionPool" lint_report.txt
-
+        grep "Applying linter tests... CHECK" lint_report.txt
   test-tools:
     name: Test testing of tools
     needs: [setup-ci-tools]
@@ -228,6 +229,7 @@ jobs:
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         chunk: ${{ matrix.chunk }}
         chunk-count: ${{ needs.setup-ci-tools.outputs.chunk-count }}
+        additional-planemo-options: --simultaneous_uploads --check_uploads_ok
     - uses: actions/upload-artifact@v2
       with:
         name: 'Tool test output ${{ matrix.chunk }}'

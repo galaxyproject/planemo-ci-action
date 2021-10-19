@@ -77,7 +77,7 @@ Lint mode
 
 Calls `planemo shed_lint` for each repository and checks if each tool is in a repository (i.e. metadata like `.shed.yml` is present).
 
-Inputs (all of them required):
+Required inputs:
 
 - `repository-list` 
 - `tool-list`
@@ -86,6 +86,7 @@ Optional inputs:
 
 - `report_level`: all|warn|error (default: all)
 - `fail_level`: warn|error (default: error)
+- `additional-planemo-options`: additional options passed to `planemo lint`. [Here](https://github.com/galaxyproject/planemo-ci-action/blob/b8ede8dc7767a86ac8bae582554d18ea00863259/.github/workflows/tools.yaml#L179) this is used to overwrite the warn level of `planemo lint`. 
 
 Output:
 
@@ -98,7 +99,7 @@ Runs `planemo test` for each tool in a chunk using `ci_find_tools`. Note that no
 will produce a non-zero exit code even if the tests fail. Success needs to be checked with the
 `check` mode after combining the outputs of the chunks.
 
-Inputs:
+Required inputs:
 
 - `repository-list`: List of repositories
 - `workflows`: test workflows
@@ -112,6 +113,7 @@ Optional inputs:
 - `galaxy-branch`
 - `galaxy-source`
 - `python-version`
+- `additional-planemo-options`: additional options passed to `planemo test`, see for instance [here](https://github.com/galaxyproject/planemo-ci-action/blob/657582777416fc51b6171961d90dced7dacbeea2/.github/workflows/tools.yaml#L229)
 
 Output:
 
@@ -122,7 +124,7 @@ Combine test outputs mode
 
 Combines the test result of the chunked tests and create html or markdown reports.
 
-Input: 
+Required input: 
 
 - json files need to be placed in a directory `artifacts/`.
 
@@ -142,7 +144,7 @@ Test combined outputs mode
 
 Check the combined outputs for failed test runs. If a failed test is found exit code 1 is returned.
 
-Input:
+Required input:
 
 tool test results in `upload/tool_test_output.json`
 
@@ -155,7 +157,7 @@ Deploy mode
 
 Deploy all repositories to a toolshed.
 
-Inputs:
+Required inputs:
 
 - `workflows`: deploy workflows to github namespace
 - `workflow-namespace`
