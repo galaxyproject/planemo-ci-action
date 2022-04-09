@@ -1,0 +1,34 @@
+<tool id="galaxy_slots" name="galaxy_slots" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="20.01" license="MIT">
+    <macros>
+        <token name="@TOOL_VERSION@">0.1.0</token>
+        <token name="@VERSION_SUFFIX@">0</token>
+    </macros>
+    <command detect_errors="exit_code"><![CDATA[
+        echo "GALAXY_SLOTS \${GALAXY_SLOTS:-1}" > '$out'
+    ]]></command>
+    <inputs/>
+    <outputs>
+        <data name="out" format="txt"/>
+    </outputs>
+    <tests>
+        <test>
+            <output name="out">
+                <assert_contents>
+                    <has_line line="GALAXY_SLOTS 1" negate="true"/>
+                </assert_contents>
+            </output>
+        </test>
+    </tests>
+    <help><![CDATA[
+
+**Input**
+
+
+**Output**
+
+
+    ]]></help>
+    <citations>
+        <citation type="doi">blah</citation>
+    </citations>
+</tool>

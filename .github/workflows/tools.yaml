@@ -145,8 +145,8 @@ jobs:
         if ! grep -q "tool1.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then echo "tool1.xml must be in the repo list"; exit 1; fi
         if ! grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then echo "tool2.xml must be in the repo list"; exit 1; fi
     # chunk-count will only consider tools/workflows depending on the workflow input to the action
-    - name: Check that the number of chunks is two, i.e. the number of tools
-      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "2" ]; then exit 1; fi
+    - name: Check that the number of chunks is three, i.e. the number of tools
+      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "3" ]; then exit 1; fi
 
   lint:
     name: Test linting of tools
@@ -217,6 +217,9 @@ jobs:
       with:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-ci-tools.outputs.galaxy-head-sha }}
+    - name: Get number of CPU cores
+      uses: SimenB/github-actions-cpu-cores@v1
+      id: cpu-cores
     - name: Planemo test tools
       uses: ./
       id: test-tools
@@ -228,6 +231,7 @@ jobs:
         chunk: ${{ matrix.chunk }}
         chunk-count: ${{ needs.setup-ci-tools.outputs.chunk-count }}
         additional-planemo-options: --simultaneous_uploads --check_uploads_ok
+        galaxy-slots: ${{ steps.cpu-cores.outputs.count }}
     - uses: actions/upload-artifact@v2
       with:
         name: 'Tool test output ${{ matrix.chunk }}'
@@ -264,7 +268,7 @@ jobs:
         mode: combine
         html-report: true
     - name: Check statistics
-      run: if ! grep -q "2\s\+success" <<<$(echo ${{ steps.combine.outputs.statistics }}); then echo "wrong statistics"; exit 1; fi
+      run: if ! grep -q "3\s\+success" <<<$(echo ${{ steps.combine.outputs.statistics }}); then echo "wrong statistics"; exit 1; fi
     - uses: actions/upload-artifact@v2
       with:
         name: 'All tool test results'
