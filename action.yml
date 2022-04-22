@@ -133,6 +133,7 @@ runs:
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
+        SHED_KEY: ${{ inputs.shed-key }}
         REPORT_LEVEL: ${{ inputs.report-level }}
         FAIL_LEVEL: ${{ inputs.fail-level }}
         SETUP_CVMFS: ${{ inputs.setup-cvmfs }}
