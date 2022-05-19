@@ -115,6 +115,7 @@ Optional inputs:
 - `python-version`
 - `additional-planemo-options`: additional options passed to `planemo test`, see for instance [here](https://github.com/galaxyproject/planemo-ci-action/blob/657582777416fc51b6171961d90dced7dacbeea2/.github/workflows/tools.yaml#L229)
 - `galaxy-slots`: number of slots (threads) to use in Galaxy jobs (sets the `GALAXY_SLOTS` environment variable)
+- `test_default_wait`:  Maximum runtime of a single test in seconds, default: 0 means unlimited
 
 Output:
 
