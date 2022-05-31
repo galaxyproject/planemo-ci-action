@@ -74,9 +74,9 @@ inputs:
   galaxy-slots:
     description: 'Number of cores to be used for Galaxy jobs in planemo test'
     default: '1'
-  test_default_wait:
+  test_timeout:
     description: 'Maximum runtime of a single test in seconds, default: 0 means unlimited'
-    default: '0'
+    default: 86400
   # inputs that are needed for testing this action
   # not supposed to be used
   github-event-name-override:
@@ -147,7 +147,7 @@ runs:
         GITHUB_REF_OVERRIDE: ${{ inputs.github-ref-override }}
         ADDITIONAL_PLANEMO_OPTIONS: ${{ inputs.additional-planemo-options }}
         GALAXY_SLOTS: ${{ inputs.galaxy-slots }}
-        TEST_DEFAULT_WAIT: ${{ inputs.test_default_wait }}
+        TEST_TIMEOUT: ${{ inputs.test_timeout }}
 
     # see https://trstringer.com/github-actions-multiline-strings/
     - run: |
