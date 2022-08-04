@@ -111,6 +111,14 @@ fi
 # - call `planemo lint` for each repo
 # - check if each tool is in a repo (i.e. if `.shed.yml` is present)
 if [ "$MODE" == "lint" ]; then
+  # workaround for https://github.com/galaxyproject/planemo/issues/1261
+  # allow insecure protocols as suggested in 
+  # https://askubuntu.com/questions/1233186/ubuntu-20-04-how-to-set-lower-ssl-security-level
+  echo "openssl_conf = default_conf" > /tmp/openssl.cnf
+  cat /etc/ssl/openssl.cnf >> /tmp/openssl.cnf
+  echo -e "[ default_conf ]\n\nssl_conf = ssl_sect\n\n[ssl_sect]\n\nsystem_default = system_default_sect\n\n[system_default_sect]\nMinProtocol = TLSv1.2\nCipherString = DEFAULT:@SECLEVEL=1" >> /tmp/openssl.cnf
+  export OPENSSL_CONF=/tmp/openssl.cnf
+  
   mapfile -t REPO_ARRAY < repository_list.txt
   for DIR in "${REPO_ARRAY[@]}"; do
     if [ "$WORKFLOWS" != "true" ]; then
