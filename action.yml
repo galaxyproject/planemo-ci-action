@@ -149,21 +149,16 @@ runs:
         GALAXY_SLOTS: ${{ inputs.galaxy-slots }}
         TEST_TIMEOUT: ${{ inputs.test_timeout }}
 
-    # see https://trstringer.com/github-actions-multiline-strings/
     - run: |
-        REPOS=$(cat repository_list.txt)
-        REPOS="${REPOS//'%'/'%25'}"
-        REPOS="${REPOS//$'\n'/'%0A'}"
-        REPOS="${REPOS//$'\r'/'%0D'}"
-        echo "repository-list=$REPOS" >> $GITHUB_OUTPUT
+        echo 'repository-list<<EOF' >> $GITHUB_OUTPUT
+        cat repository_list.txt >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
       id: repository-list
       shell: bash
     - run: |
-        TOOLS=$(cat tool_list.txt)
-        TOOLS="${TOOLS//'%'/'%25'}"
-        TOOLS="${TOOLS//$'\n'/'%0A'}"
-        TOOLS="${TOOLS//$'\r'/'%0D'}"
-        echo "tool-list=$TOOLS" >> $GITHUB_OUTPUT
+        echo 'tool-list<<EOF' >> $GITHUB_OUTPUT
+        cat tool_list.txt >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
       id: tool-list
       shell: bash
     - run: echo "commit-range=$(cat commit_range.txt)" >> $GITHUB_OUTPUT
