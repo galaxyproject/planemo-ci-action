@@ -155,7 +155,7 @@ runs:
         REPOS="${REPOS//'%'/'%25'}"
         REPOS="${REPOS//$'\n'/'%0A'}"
         REPOS="${REPOS//$'\r'/'%0D'}"
-        echo "::set-output name=repository-list::$REPOS"
+        echo "repository-list=$REPOS" >> $GITHUB_OUTPUT
       id: repository-list
       shell: bash
     - run: |
@@ -163,18 +163,18 @@ runs:
         TOOLS="${TOOLS//'%'/'%25'}"
         TOOLS="${TOOLS//$'\n'/'%0A'}"
         TOOLS="${TOOLS//$'\r'/'%0D'}"
-        echo "::set-output name=tool-list::$TOOLS"
+        echo "tool-list=$TOOLS" >> $GITHUB_OUTPUT
       id: tool-list
       shell: bash
-    - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
+    - run: echo "commit-range=$(cat commit_range.txt)" >> $GITHUB_OUTPUT
       id: commit-range
       shell: bash
-    - run: echo "::set-output name=chunk-count::$(cat chunk_count.txt)"
+    - run: echo "chunk-count=$(cat chunk_count.txt)" >> $GITHUB_OUTPUT
       id: chunk-count
       shell: bash
-    - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]"
+    - run: echo "chunk-list=[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]" >> $GITHUB_OUTPUT
       id: chunk-list
       shell: bash
-    - run: echo ::set-output name=statistics::$(cat statistics.txt)
+    - run: echo "statistics=$(cat statistics.txt)" >> $GITHUB_OUTPUT
       id: statistics
       shell: bash
