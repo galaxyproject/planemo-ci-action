@@ -151,13 +151,13 @@ runs:
 
     - run: |
         echo 'repository-list<<EOF' >> $GITHUB_OUTPUT
-        cat repository_list.txt >> $GITHUB_OUTPUT
+        echo "$(cat repository_list.txt)" >> $GITHUB_OUTPUT
         echo 'EOF' >> $GITHUB_OUTPUT
       id: repository-list
       shell: bash
     - run: |
         echo 'tool-list<<EOF' >> $GITHUB_OUTPUT
-        cat tool_list.txt >> $GITHUB_OUTPUT
+        echo "$(cat tool_list.txt)" >> $GITHUB_OUTPUT
         echo 'EOF' >> $GITHUB_OUTPUT
       id: tool-list
       shell: bash
