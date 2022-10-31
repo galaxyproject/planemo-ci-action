@@ -11,7 +11,7 @@ read -ra ADDITIONAL_PLANEMO_OPTIONS <<< "$ADDITIONAL_PLANEMO_OPTIONS"
 mkdir -p upload
 touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statistics.txt 
 
-# run a mock planemo test (should be considered part of setup mode)
+# run planemo ci_setup
 if [ "$CREATE_CACHE" != "false" ]; then
   PIP_QUIET=1 planemo ci_setup --galaxy_python_version "$PYTHON_VERSION" --galaxy_source https://github.com/"$GALAXY_FORK"/galaxy --galaxy_branch "$GALAXY_BRANCH"
 fi
