@@ -13,9 +13,7 @@ touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statist
 
 # run a mock planemo test (should be considered part of setup mode)
 if [ "$CREATE_CACHE" != "false" ]; then
-  tmp_dir=$(mktemp -d)
-  touch "$tmp_dir/tool.xml"
-  PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --no_conda_auto_init --galaxy_source https://github.com/"$GALAXY_FORK"/galaxy --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
+  PIP_QUIET=1 planemo ci_setup --galaxy_python_version "$PYTHON_VERSION" --galaxy_source https://github.com/"$GALAXY_FORK"/galaxy --galaxy_branch "$GALAXY_BRANCH"
 fi
 
 GITHUB_EVENT_NAME=${GITHUB_EVENT_NAME_OVERRIDE:-$GITHUB_EVENT_NAME}
