@@ -170,6 +170,9 @@ runs:
     - run: echo "chunk-list=[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]" >> $GITHUB_OUTPUT
       id: chunk-list
       shell: bash
-    - run: echo "statistics=$(cat statistics.txt)" >> $GITHUB_OUTPUT
+    - run: |
+        echo 'statistics<<EOF' >> $GITHUB_OUTPUT
+        echo "$(cat statistics.txt)" >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
       id: statistics
       shell: bash
