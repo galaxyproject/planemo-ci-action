@@ -98,7 +98,7 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
   elif [ "$CHUNK_COUNT" -eq 0 ]; then
     CHUNK_COUNT=1
   fi
-  echo $CHUNK_COUNT > chunk_count.txt
+  echo "$CHUNK_COUNT" > chunk_count.txt
 else
   echo -n "$REPOSITORIES" > repository_list.txt
   echo -n "$TOOLS" > tool_list.txt
