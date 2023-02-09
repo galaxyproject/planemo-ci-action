@@ -20,6 +20,11 @@ on:
         default: "planemo"
         required: false
         type: string
+      planemo-ci-action:
+        description: 'Version of the planemo ci action to use'
+        default: 'galaxyproject/planemo-ci-action@v1'
+        required: false
+        type: string
     secrets:
       TTS_API_KEY:
         required: true
@@ -49,7 +54,7 @@ jobs:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ inputs.galaxy-head-sha }}_planemo_${{ steps.get-galaxy-sha.outputs.planemo-version }}
     - name: Deploy on testtoolshed
-      uses: galaxyproject/planemo-ci-action@v1
+      uses: ${{ planemo-ci-action }}
       with:
         mode: deploy
         repository-list: ${{ inputs.repository-list }}

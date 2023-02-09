@@ -46,6 +46,11 @@ on:
         default: "planemo"
         required: false
         type: string
+      planemo-ci-action:
+        description: 'Version of the planemo ci action to use'
+        default: 'galaxyproject/planemo-ci-action@v1'
+        required: false
+        type: string
     secrets:
       PAT:
         required: false
@@ -101,7 +106,7 @@ jobs:
     - name: Clean dotnet folder for space
       run: rm -Rf /usr/share/dotnet
     - name: Planemo test
-      uses: galaxyproject/planemo-ci-action@v1
+      uses: ${{ planemo-ci-action }}
       id: test
       with:
         mode: test
@@ -145,7 +150,7 @@ jobs:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ inputs.galaxy-head-sha }}_planemo_${{ steps.get-galaxy-sha.outputs.planemo-version }}
     - name: Combine outputs
-      uses: galaxyproject/planemo-ci-action@v1
+      uses: ${{ planemo-ci-action }}
       id: combine
       with:
         mode: combine
