@@ -58,7 +58,9 @@ on:
       result:
         description: "Result of the testing"
         value: ${{ jobs.test-success.result }}
-
+      statistics:
+        description: "Statistics of the test results"
+        value: "${{ jobs.combine_outputs.outputs.statistics }}"
 jobs:
   # Planemo test the changed repositories, each chunk creates an artifact
   # containing HTML and JSON reports for the executed tests
@@ -133,6 +135,8 @@ jobs:
     name: Combine chunked test results
     needs: test
     runs-on: ubuntu-latest
+    outputs:
+      galaxy-fork: ${{ steps.combine.outputs.statistics }}
     strategy:
       matrix:
         python-version: ${{ fromJson(inputs.python-version-list) }}
