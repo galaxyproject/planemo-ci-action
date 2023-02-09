@@ -1,0 +1,89 @@
+name: Deploy Tools
+on:
+  workflow_call:
+    inputs:
+      galaxy-head-sha:
+        description: 'hash of the latest commit in the Galaxy repo'
+        required: true
+        type: string
+      repository-list:
+        description: 'list of repositories to deploy'
+        required: true
+        type: string
+      python-version-list:
+        description: 'Python versions (stringified JSON array)'
+        default: "[\"3.7\"]"
+        required: false
+        type: string
+      planemo-version:
+        description: 'Planemo version to use'
+        default: "planemo"
+        required: false
+        type: string
+    secrets:
+      TTS_API_KEY:
+        required: true
+      TS_API_KEY:
+        required: true
+
+jobs:
+  # deploy the tools to the toolsheds (first TTS for testing)
+  deploy:
+    name: Deploy
+    if: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' ) }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ${{ fromJson(inputs.python-version-list) }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache .cache/pip
+      uses: actions/cache@v3
+      id: cache-pip
+      with:
+        path: ~/.cache/pip
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ inputs.galaxy-head-sha }}_planemo_${{ steps.get-galaxy-sha.outputs.planemo-version }}
+    - name: Deploy on testtoolshed
+      uses: galaxyproject/planemo-ci-action@v1
+      with:
+        mode: deploy
+        repository-list: ${{ inputs.repository-list }}
+        shed-target: testtoolshed
+        shed-key: ${{ secrets.TTS_API_KEY }}
+        planemo-version: ${{ inputs.planemo-version }}
+      continue-on-error: true
+    - name: Deploy on toolshed
+      uses: galaxyproject/planemo-ci-action@v1
+      with:
+        mode: deploy
+        repository-list: ${{ inputs.repository-list }}
+        shed-target: toolshed
+        shed-key: ${{ secrets.TS_API_KEY }}
+        planemo-version: ${{ inputs.planemo-version }}
+
+  deploy-report:
+    name: Report deploy status
+    needs: [deploy]
+    if: ${{ always() && needs.deploy.result != 'success' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' ) }}
+    runs-on: ubuntu-latest
+    steps:
+    # report to the PR if deployment failed
+    - name: Get PR object
+      uses: 8BitJonny/gh-get-current-pr@2.2.0
+      id: getpr
+      with:
+        sha: ${{ github.event.after }}
+    - name: Create comment
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        token: ${{ secrets.PAT }}
+        issue-number: ${{ steps.getpr.outputs.number }}
+        body: |
+          Attention: deployment ${{ needs.deploy.result }}!
+
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
