@@ -84,7 +84,7 @@ jobs:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ inputs.galaxy-head-sha }}_planemo_${{ steps.get-galaxy-sha.outputs.planemo-version }}
     - name: Planemo lint
-      uses: galaxyproject/planemo-ci-action@v1
+      uses: ./
       id: lint
       with:
         mode: lint

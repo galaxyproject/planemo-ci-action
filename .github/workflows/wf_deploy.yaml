@@ -49,7 +49,7 @@ jobs:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ inputs.galaxy-head-sha }}_planemo_${{ steps.get-galaxy-sha.outputs.planemo-version }}
     - name: Deploy on testtoolshed
-      uses: galaxyproject/planemo-ci-action@v1
+      uses: ./
       with:
         mode: deploy
         repository-list: ${{ inputs.repository-list }}
@@ -58,7 +58,7 @@ jobs:
         planemo-version: ${{ inputs.planemo-version }}
       continue-on-error: true
     - name: Deploy on toolshed
-      uses: galaxyproject/planemo-ci-action@v1
+      uses: ./
       with:
         mode: deploy
         repository-list: ${{ inputs.repository-list }}

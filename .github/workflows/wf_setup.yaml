@@ -148,7 +148,7 @@ jobs:
       with:
         fetch-depth: ${{ inputs.fetch-depth }}
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
-      uses: galaxyproject/planemo-ci-action@v1
+      uses: ./
       id: discover
       with:
         create-cache: ${{ steps.cache-pip.outputs.cache-hit != 'true' || steps.cache-planemo.outputs.cache-hit != 'true' }}
