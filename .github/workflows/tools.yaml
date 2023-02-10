@@ -127,7 +127,6 @@ jobs:
       galaxy-head-sha: ${{ needs.setup-ci-tools.outputs.galaxy-head-sha }}
       commit-range: ${{ needs.setup-ci-tools.outputs.commit-range }}
       planemo-version: ${{ needs.setup-ci-tools.outputs.planemo-version }}
-      planemo-ci-action: ./
 
   check-lint:
     name: Check linting results
@@ -158,7 +157,6 @@ jobs:
       galaxy-head-sha: ${{ needs.setup.outputs.galaxy-head-sha }}
       # set these values if you want to use different values than the IUC defaults
       # test-timeout: 900
-      planemo-ci-action: ./
 
   check-test:
     name: Check testing results
