@@ -56,11 +56,6 @@ on:
         default: "planemo"
         required: false
         type: string
-      planemo-ci-action:
-        description: 'Version of the planemo ci action to use'
-        default: 'galaxyproject/planemo-ci-action@v1'
-        required: false
-        type: string
     outputs:
       result:
         description: "Result of the lint jobs"
