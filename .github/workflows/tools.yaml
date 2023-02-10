@@ -86,7 +86,7 @@ jobs:
   setup-ci-tools:
     name: Setup as in CI for tools
     if: ${{ github.repository_owner == 'galaxyproject' }}
-    uses: ./.github/workflows/wf_setup.yaml@v1
+    uses: ./.github/workflows/wf_setup.yaml
     with:
       # default-galaxy-fork: galaxyproject
       # default-galaxy-branch: release_22.05
