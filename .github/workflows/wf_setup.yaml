@@ -1,4 +1,4 @@
-name: Test tools
+name: Setup tool tests
 on:
   workflow_call:
     inputs:
@@ -29,6 +29,17 @@ on:
       python-version-list:
         description: 'Python versions (stringified JSON array)'
         default: "[\"3.7\"]"
+        required: false
+        type: string
+      ## supposed to be used in internal testing only
+      github-event-name-override:
+        description: 'ONLY FOR TESTING: override GITHUB_EVENT_NAME'
+        default: ''
+        required: false
+        type: string
+      github-ref-override:
+        description: 'ONLY FOR TESTING: override GITHUB_REF'
+        default: ''
         required: false
         type: string
     secrets:
@@ -157,6 +168,8 @@ jobs:
         max-chunks: ${{ inputs.max-chunks }}
         python-version: ${{ matrix.python-version }}
         planemo-version: ${{ needs.fork-branch.outputs.planemo-version }}
+        github-event-name-override: ${{ inputs.github-event-name-override }}
+        github-ref-override: ${{ inputs.github-ref-override }}
     - name: Show commit range
       run: echo '${{ steps.discover.outputs.commit-range }}'
     - name: Show repository list

@@ -91,6 +91,7 @@ jobs:
       # default-galaxy-fork: galaxyproject
       # default-galaxy-branch: release_22.05
       max-chunks: 40
+      github-event-name-override: 'schedule'
     secrets:
       PAT: ${{ secrets.PAT }}
 
