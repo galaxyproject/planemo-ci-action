@@ -1,4 +1,7 @@
-categories: [Sequence Analysis]
+categories: [Testing]
 description: test setting GALAXY_SLOTS
 name: galaxy_slots
 owner: adent
+long_description: test GALAXY_SLOTS
+remote_repository_url: https://github.com/galaxyproject/planemo-ci-action
+homepage_url: https://github.com/galaxyproject/planemo-ci-action
