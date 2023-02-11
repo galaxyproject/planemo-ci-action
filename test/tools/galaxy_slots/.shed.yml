@@ -1,4 +1,5 @@
-categories: [Testing]
+categories:
+- Sequence Analysis
 description: test setting GALAXY_SLOTS
 name: galaxy_slots
 owner: adent
