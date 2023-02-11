@@ -121,7 +121,6 @@ jobs:
   lint:
     name: Lint
     needs: setup-ci-tools
-    continue-on-error: true
     uses: ./.github/workflows/wf_lint.yaml
     with:
       repository-list: ${{ needs.setup-ci-tools.outputs.repository-list }}
@@ -139,6 +138,7 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         path: lint_report.txt
+    # TODO check result of lint job (ie make sure it failed)
     - name: check if all test tools were linted
       run: |
         grep tool1 lint_report.txt
