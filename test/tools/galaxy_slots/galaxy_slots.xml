@@ -6,9 +6,7 @@
     <command detect_errors="exit_code"><![CDATA[
         echo "GALAXY_SLOTS \${GALAXY_SLOTS:-1}" > '$out'
     ]]></command>
-    <inputs>
-        <param name="mock" type="text"/>
-    </inputs>
+    <inputs/>
     <outputs>
         <data name="out" format="txt"/>
     </outputs>
