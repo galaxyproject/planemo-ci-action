@@ -151,13 +151,13 @@ jobs:
     needs: setup-ci-tools
     uses: ./.github/workflows/wf_test.yaml
     with:
-      galaxy-fork: ${{ needs.setup.outputs.galaxy-fork }}
-      galaxy-branch: ${{ needs.setup.outputs.galaxy-branch }}
-      planemo-version: ${{ needs.setup.outputs.planemo-version }}
-      repository-list: ${{ needs.setup.outputs.repository-list }}
-      chunk-count: ${{ needs.setup.outputs.chunk-count }}
-      chunk-list: ${{ needs.setup.outputs.chunk-list }}
-      galaxy-head-sha: ${{ needs.setup.outputs.galaxy-head-sha }}
+      galaxy-fork: ${{ needs.setup-ci-tools.outputs.galaxy-fork }}
+      galaxy-branch: ${{ needs.setup-ci-tools.outputs.galaxy-branch }}
+      planemo-version: ${{ needs.setup-ci-tools.outputs.planemo-version }}
+      repository-list: ${{ needs.setup-ci-tools.outputs.repository-list }}
+      chunk-count: ${{ needs.setup-ci-tools.outputs.chunk-count }}
+      chunk-list: ${{ needs.setup-ci-tools.outputs.chunk-list }}
+      galaxy-head-sha: ${{ needs.setup-ci-tools.outputs.galaxy-head-sha }}
       # set these values if you want to use different values than the IUC defaults
       # test-timeout: 900
 
