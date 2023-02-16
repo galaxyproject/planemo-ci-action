@@ -223,6 +223,18 @@ jobs:
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         chunk: ${{ matrix.chunk }}
         chunk-count: ${{ needs.setup-ci-workflows.outputs.chunk-count }}
+    - name: 2nd run test workflows
+      uses: ./
+      id: test-workflows-2
+      with:
+        mode: test
+        workflows: true
+        setup-cvmfs: false
+        repository-list: ${{ needs.setup-ci-workflows.outputs.repository-list }}
+        galaxy-fork: ${{ env.GALAXY_FORK }}
+        galaxy-branch: ${{ env.GALAXY_BRANCH }}
+        chunk: ${{ matrix.chunk }}
+        chunk-count: ${{ needs.setup-ci-workflows.outputs.chunk-count }}
     - uses: actions/upload-artifact@v3
       with:
         name: 'Workflow test output ${{ matrix.chunk }}'
