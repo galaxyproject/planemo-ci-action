@@ -199,7 +199,7 @@ fi
 # check outputs mode
 # - check if there were unsuccessful tests
 if [ "$MODE" == "check" ]; then
-  if jq '.["tests"][]["data"] | {status: .status, id: .tool_id, idx: .test_index} | join(";")' tool_test_output.json | grep -v "success;"; then
+  if jq '.["tests"][]["data"] | {status: .status, id: .tool_id, idx: .test_index} | join(";")' upload/tool_test_output.json | grep -v "success;"; then
     echo "Unsuccessful tests found, inspect the 'All tool test results' artifact for details."
     exit 1
   fi
