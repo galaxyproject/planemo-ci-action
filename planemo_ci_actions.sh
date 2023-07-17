@@ -4,7 +4,7 @@ set -exo pipefail
 # function running an infinite loop pruning (unused) docker images
 function background_prune_docker {
   while 1; do
-    docker system prune --all --volumes
+    docker system prune --all --volumes --force
     sleep 60
   done
 }
@@ -161,7 +161,7 @@ if [ "$MODE" == "test" ]; then
   # show tools
   cat tool_list_chunk.txt
 
-  background_prune_docker &
+  background_prune_docker &> /dev/null &
   PRUNE_PID=$!
 
   # Test tools
