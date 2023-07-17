@@ -3,8 +3,8 @@ set -exo pipefail
 
 # function running an infinite loop pruning (unused) docker images
 function background_prune_docker {
-  while 1; do
-    docker system prune --all --volumes --force
+  while true; do
+    docker system prune --all --volumes --force &> /dev/null
     sleep 60
   done
 }
@@ -161,7 +161,7 @@ if [ "$MODE" == "test" ]; then
   # show tools
   cat tool_list_chunk.txt
 
-  background_prune_docker &> /dev/null &
+  background_prune_docker &
   PRUNE_PID=$!
 
   # Test tools
@@ -189,6 +189,7 @@ if [ "$MODE" == "test" ]; then
   planemo test_reports tool_test_output.json --test_output tool_test_output.html
   
   mv tool_test_output.json tool_test_output.html upload/
+
   kill "$PRUNE_PID"
 fi
 
