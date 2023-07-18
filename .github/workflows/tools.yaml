@@ -270,7 +270,17 @@ jobs:
         mode: combine
         html-report: true
     - name: Check statistics
-      run: if ! grep -q "3\s\+success" <<<$(echo ${{ steps.combine.outputs.statistics }}); then echo "wrong statistics"; exit 1; fi
+      run: |
+        if ! grep -q "3\s\+success" <<<$(echo ${{ steps.combine.outputs.statistics }}); then
+          echo "wrong statistics: expected 3 success";
+          echo ${{ steps.combine.outputs.statistics }};
+          exit 1;
+        fi
+        if ! grep -q "1\s\+failure" <<<$(echo ${{ steps.combine.outputs.statistics }}); then
+          echo "wrong statistics: expected 1 failure";
+          echo ${{ steps.combine.outputs.statistics }};
+          exit 1;
+        fi
     - uses: actions/upload-artifact@v3
       with:
         name: 'All tool test results'
