@@ -248,8 +248,7 @@ jobs:
     # This job runs on Linux
     runs-on: ubuntu-latest
     steps:
-    - uses: 
-    actions/checkout@v3
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 1
     - uses: actions/download-artifact@v3
