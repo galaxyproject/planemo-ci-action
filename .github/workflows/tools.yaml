@@ -145,8 +145,8 @@ jobs:
         if ! grep -q "tool1.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then echo "tool1.xml must be in the repo list"; exit 1; fi
         if ! grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then echo "tool2.xml must be in the repo list"; exit 1; fi
     # chunk-count will only consider tools/workflows depending on the workflow input to the action
-    - name: Check that the number of chunks is three, i.e. the number of tools
-      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "3" ]; then exit 1; fi
+    - name: Check that the number of chunks is four, i.e. the number of tools
+      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "4" ]; then exit 1; fi
 
   lint:
     name: Test linting of tools
