@@ -248,7 +248,8 @@ jobs:
     # This job runs on Linux
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: 
+    actions/checkout@v3
       with:
         fetch-depth: 1
     - uses: actions/download-artifact@v3
@@ -287,6 +288,13 @@ jobs:
         path: upload
     - name: Check outputs
       uses: ./
+      continue-on-error: true
       id: check
       with:
         mode: check
+    - name: Check on failures
+      if: steps.check.outcome != 'failure'
+      run: |
+        echo "outcome  ${{ steps.check.outcome }}" 
+        exit 1
+
