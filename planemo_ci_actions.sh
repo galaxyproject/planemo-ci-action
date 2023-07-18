@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -exo pipefail
 
-PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION" --test_timeout "$TEST_TIMEOUT")
+PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION" --test_timeout "$TEST_TIMEOUT" --no_cache_galaxy)
 PLANEMO_CONTAINER_DEPENDENCIES=("--biocontainers" "--no_dependency_resolution" "--no_conda_auto_init" "--docker_extra_volume" "./")
 PLANEMO_WORKFLOW_OPTIONS=("--tool_data_table" "/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "--docker_extra_volume" "/cvmfs" --shed_tool_conf /tmp/shed_tool_conf.xml --shed_tool_path /tmp/shed_dir)
 read -ra ADDITIONAL_PLANEMO_OPTIONS <<< "$ADDITIONAL_PLANEMO_OPTIONS"
