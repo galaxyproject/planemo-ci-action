@@ -1,14 +1,6 @@
 #!/usr/bin/env bash
 set -exo pipefail
 
-# function running an infinite loop pruning (unused) docker images
-function background_prune_docker {
-  while true; do
-    docker system prune --all --volumes --force &> /dev/null
-    sleep 60
-  done
-}
-
 PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION" --test_timeout "$TEST_TIMEOUT")
 PLANEMO_CONTAINER_DEPENDENCIES=("--biocontainers" "--no_dependency_resolution" "--no_conda_auto_init" "--docker_extra_volume" "./")
 PLANEMO_WORKFLOW_OPTIONS=("--tool_data_table" "/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "--docker_extra_volume" "/cvmfs" --shed_tool_conf /tmp/shed_tool_conf.xml --shed_tool_path /tmp/shed_dir)
@@ -160,14 +152,12 @@ if [ "$MODE" == "test" ]; then
 
   # show tools
   cat tool_list_chunk.txt
-
-  background_prune_docker &
-  PRUNE_PID=$!
-
+  
   # Test tools
   mkdir -p json_output
   touch .tt_biocontainer_skip
   while read -r -a TOOL_GROUP; do
+    docker system prune --all --force --volumes || true
     # Check if any of the lines in .tt_biocontainer_skip is a substring of $TOOL_GROUP
     if echo "${TOOL_GROUP[@]}" | grep -qf .tt_biocontainer_skip; then
       PLANEMO_OPTIONS=()
@@ -189,8 +179,6 @@ if [ "$MODE" == "test" ]; then
   planemo test_reports tool_test_output.json --test_output tool_test_output.html
   
   mv tool_test_output.json tool_test_output.html upload/
-
-  kill "$PRUNE_PID"
 fi
 
 # combine reports mode
