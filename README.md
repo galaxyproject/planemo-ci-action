@@ -103,7 +103,7 @@ Required inputs:
 
 - `repository-list`: List of repositories
 - `workflows`: test workflows
-- `setup-cvmfs`: setup CVMFS (only useful for testing workflows)
+- `setup-cvmfs`: setup CVMFS (automatically set if workflows are tested. In most cases only useful for workflows, e.g. only in workflow mode docker binds will be setup.)
 - `chunk`: Current chunk
 - `chunk-count`: Maximum chunk
 

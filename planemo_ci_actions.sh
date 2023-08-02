@@ -135,7 +135,7 @@ fi
 # - merge the test reports for the tool groups
 if [ "$MODE" == "test" ]; then
 
-  if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
+  if [ "$WORKFLOWS" == "true" ] || [ "$SETUP_CVMFS" == "true" ]; then
     "$GITHUB_ACTION_PATH"/cvmfs/setup_cvmfs.sh
   fi
 
