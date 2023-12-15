@@ -113,12 +113,9 @@ if [ "$MODE" == "lint" ]; then
   mapfile -t REPO_ARRAY < repository_list.txt
   for DIR in "${REPO_ARRAY[@]}"; do
     if [ "$WORKFLOWS" != "true" ]; then
-      planemo shed_lint --tools --ensure_metadata --urls --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt
+      (planemo shed_lint --tools --ensure_metadata --urls --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt) || lint_fail=true
     else
-      planemo workflow_lint --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt
-    fi
-    if [ "${PIPESTATUS[0]}" -ne 0 ]; then
-        lint_fail=true
+      (planemo workflow_lint --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt) || lint_fail=true
     fi
   done
   # Check if each changed tool is in the list of changed repositories
