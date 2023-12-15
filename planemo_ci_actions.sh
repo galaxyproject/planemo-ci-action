@@ -129,6 +129,7 @@ if [ "$MODE" == "lint" ]; then
   done
 fi
 
+
 # test mode
 # - compute grouped chunked tool list
 # - run `planemo test` each tool group
