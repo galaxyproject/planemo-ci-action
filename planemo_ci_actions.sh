@@ -109,24 +109,27 @@ fi
 # - call `planemo lint` for each repo
 # - check if each tool is in a repo (i.e. if `.shed.yml` is present)
 if [ "$MODE" == "lint" ]; then
+  lint_fail=false
   mapfile -t REPO_ARRAY < repository_list.txt
   for DIR in "${REPO_ARRAY[@]}"; do
     if [ "$WORKFLOWS" != "true" ]; then
-      planemo shed_lint --tools --ensure_metadata --urls --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt
+      (planemo shed_lint --tools --ensure_metadata --urls --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt) || lint_fail=true
     else
-      planemo workflow_lint --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt
+      (planemo workflow_lint --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt) || lint_fail=true
     fi
   done
-
   # Check if each changed tool is in the list of changed repositories
   mapfile -t TOOL_ARRAY < tool_list.txt
   for TOOL in "${TOOL_ARRAY[@]}"; do
     # Check if any changed repo dir is a substring of $TOOL
     if ! echo "$TOOL" | grep -qf repository_list.txt; then
       echo "Tool $TOOL not in changed repositories list: .shed.yml file missing" >&2
-      exit 1
+      lint_fail=true
     fi
   done
+  if [ "$lint_fail" = "true" ]; then
+    exit 1
+  fi
 fi
 
 # test mode

@@ -175,7 +175,7 @@ jobs:
       with:
         mode: lint
         report-level: all
-        fail-level: error
+        fail-level: warn
         repository-list: ${{ needs.setup-ci-tools.outputs.repository-list }}
         tool-list: ${{ needs.setup-ci-tools.outputs.tool-list }}
         additional-planemo-options: --report_level all
