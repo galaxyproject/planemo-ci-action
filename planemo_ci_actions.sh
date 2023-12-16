@@ -127,7 +127,7 @@ if [ "$MODE" == "lint" ]; then
       lint_fail=true
     fi
   done
-  if $lint_fail; then
+  if [ "$lint_fail" = "true" ]; then
     exit 1
   fi
 fi
