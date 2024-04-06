@@ -95,7 +95,7 @@ jobs:
       chunk-list: ${{ steps.discover.outputs.chunk-list }}
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.11]
     steps:
     - name: Determine latest commit in the Galaxy repo
       id: get-galaxy-sha
@@ -154,7 +154,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.11]
     steps:
     - uses: actions/checkout@v3
       with:
@@ -194,7 +194,7 @@ jobs:
       fail-fast: false
       matrix:
         chunk: ${{ fromJson(needs.setup-ci-tools.outputs.chunk-list) }}
-        python-version: [3.7]
+        python-version: [3.11]
     services:
       postgres:
         image: postgres:11
@@ -244,7 +244,7 @@ jobs:
     needs: [setup-ci-tools, test-tools]
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.11]
     # This job runs on Linux
     runs-on: ubuntu-latest
     steps:

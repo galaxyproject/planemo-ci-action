@@ -62,7 +62,7 @@ Optional inputs:
 - `galaxy-branch` (default latest Galaxy release)
 - `galaxy-source` (default `galaxyproject`)
 - `max-chunks` (default `20`)
-- `python-version` (default `"3.7"`)
+- `python-version` (default `"3.11"`)
 
 Outputs:
 
