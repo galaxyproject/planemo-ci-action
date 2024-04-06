@@ -13,13 +13,13 @@ inputs:
     default: 'planemo'
   galaxy-branch:
     description: 'Galaxy branch to use'
-    default: ''
+    default: 'master'
   galaxy-fork:
     description: 'Galaxy fork to use'
-    default: ''
+    default: 'galaxyproject'
   python-version:
     description: 'Python version to use'
-    default: '3.7'
+    default: '3.11'
   repository-list:
     description: 'List of repositories.'
     default: ''
