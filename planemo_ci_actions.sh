@@ -19,12 +19,18 @@ fi
 GITHUB_EVENT_NAME=${GITHUB_EVENT_NAME_OVERRIDE:-$GITHUB_EVENT_NAME}
 GITHUB_REF=${GITHUB_REF_OVERRIDE:-$GITHUB_REF}
 
+if [ "$WORKFLOWS" == "true" ]; then
+  SKIP_FILE=".wt_skip"
+else
+  SKIP_FILE=".tt_skip"
+fi
+
 # setup mode
 # - get commit range (for push and pull_request events) .. 
 #   not set for sheduled and repository_dispatch events
 # - get list of relevant tools and repositories
 #   - tools/repos in the commit range (if set)
-#   - tools/repos not listed in .tt_skip or contained in 
+#   - tools/repos not listed in .tt_skip (resp .wt_skip) or contained in 
 #     `packages/` or `deprecated/`
 # - determine chunk count as linear function of the number
 #   of tools (limited by MAX_CHUNK)
@@ -66,13 +72,13 @@ if [ "$REPOSITORIES" == "" ] && [ "$MODE" == "setup" ]; then
     PLANEMO_COMMIT_RANGE=("--changed_in_commit_range" "$COMMIT_RANGE")
   fi
   
-  touch .tt_skip
-  planemo ci_find_repos "${PLANEMO_COMMIT_RANGE[@]}" --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
+  touch "$SKIP_FILE"
+  planemo ci_find_repos "${PLANEMO_COMMIT_RANGE[@]}" --exclude packages --exclude deprecated --exclude_from "$SKIP_FILE" --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 
   touch tool_list.txt
   if [ "$WORKFLOWS" != "true" ]; then
-    planemo ci_find_tools "${PLANEMO_COMMIT_RANGE[@]}" --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
+    planemo ci_find_tools "${PLANEMO_COMMIT_RANGE[@]}" --exclude packages --exclude deprecated --exclude_from "$SKIP_FILE" --output tool_list.txt
     TOOLS=$(cat tool_list.txt)
   fi
 
