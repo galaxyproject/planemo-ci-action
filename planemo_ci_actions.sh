@@ -194,7 +194,12 @@ if [ "$MODE" == "combine" ]; then
   find artifacts/ -name tool_test_output.json -exec sh -c 'planemo merge_test_reports "$@" upload/tool_test_output.json' sh {} +
   # create html and markdown reports
   [ "$PLANEMO_HTML_REPORT" == "true" ] && planemo test_reports upload/tool_test_output.json --test_output upload/tool_test_output.html
-  [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/tool_test_output.json --test_output_markdown upload/tool_test_output.md
+  [ "$PLANEMO_MD_REPORT" == "true" ] && (
+    planemo test_reports upload/tool_test_output.json --test_output_markdown upload/tool_test_output.md
+    if [ $(stat -f %z "upload/tool_test_output.md") -gt 1048576 ]; then
+      planemo test_reports upload/tool_test_output.json --test_output_minimal_markdown upload/tool_test_output.md
+    fi
+  )
   # get statistics
   jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | sed 's/"//g' | sort | uniq -c > statistics.txt
 fi
