@@ -185,7 +185,7 @@ jobs:
         grep tool1 lint_report.txt
         grep tool2 lint_report.txt
         grep "ERROR: Error 'HTTPConnectionPool" lint_report.txt
-        grep "Applying linter tests... CHECK" lint_report.txt
+        grep "TestsNoValid" lint_report.txt
   test-tools:
     name: Test testing of tools
     needs: [setup-ci-tools]
