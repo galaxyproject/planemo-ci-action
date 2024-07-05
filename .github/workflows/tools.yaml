@@ -182,6 +182,11 @@ jobs:
       continue-on-error: true
     - name: check if all test tools were linted
       run: |
+        set -x
+        # check if the ToolIDValid linter is called (no of tools - 1 ) times, i.e. is skipped once
+        if [ "$(grep -c ToolIDValid lint_report.txt)" != "2" ]; then
+          echo "expecting exactly 2 tests for ToolIDValid"; exit 1; 
+        fi
         grep tool1 lint_report.txt
         grep tool2 lint_report.txt
         grep "ERROR: Error 'HTTPConnectionPool" lint_report.txt
