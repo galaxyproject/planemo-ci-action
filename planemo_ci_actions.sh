@@ -114,9 +114,9 @@ if [ "$MODE" == "lint" ]; then
   mapfile -t REPO_ARRAY < repository_list.txt
   for DIR in "${REPO_ARRAY[@]}"; do
     if [ "$WORKFLOWS" != "true" ]; then
-      cat .lint_skip >> "$DIR"/.tt_skip
-      cat "$DIR"/.tt_skip
-      (planemo shed_lint --tools --ensure_metadata --urls --skip_file "$DIR"/.tt_skip --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt) || lint_fail=true
+      cat .lint_skip >> "$DIR"/.lint_skip
+      cat "$DIR"/.lint_skip
+      (planemo shed_lint --tools --ensure_metadata --urls --skip_file "$DIR"/.lint_skip --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" --recursive "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt) || lint_fail=true
     else
       (planemo workflow_lint --report_level "$REPORT_LEVEL" --fail_level "$FAIL_LEVEL" "$DIR" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" | tee -a lint_report.txt) || lint_fail=true
     fi
