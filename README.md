@@ -42,6 +42,8 @@ Tools/workflows in a path that has a prefix in:
 
 Tools and workflows are discovered in all directories, except for `packages/` and `deprecated/`. These directories may be absent.
 
+A global `.lint_skip` file and per repo `.lint_skip` files can be used to list tool/workflow linters that should be skipped.
+
 Setup mode
 ----------
 
