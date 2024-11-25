@@ -200,7 +200,7 @@ if [ "$MODE" == "combine" ]; then
   [ "$PLANEMO_MD_REPORT" == "true" ] && (
     planemo test_reports upload/tool_test_output.json --test_output_markdown upload/tool_test_output.md
     if [ "$(stat -c %s upload/tool_test_output.md)" -gt 1048576 ]; then
-      planemo test_reports upload/tool_test_output.json --test_output_minimal_markdown upload/tool_test_output.md
+      planemo test_reports upload/tool_test_output.json --test_output_markdown_minimal upload/tool_test_output.md
     fi
   )
   # get statistics
