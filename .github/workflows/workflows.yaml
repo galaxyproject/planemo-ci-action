@@ -236,6 +236,7 @@ jobs:
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         chunk: ${{ matrix.chunk }}
         chunk-count: ${{ needs.setup-ci-workflows.outputs.chunk-count }}
+        galaxy-user-key: ${{ secrets.GALAXY_USER_KEY }}
     - uses: actions/upload-artifact@v4
       with:
         name: 'Workflow test output ${{ matrix.chunk }}'
