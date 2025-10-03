@@ -176,10 +176,10 @@ if [ "$MODE" == "test" ]; then
     fi
 
     if [ -f "${TOOL_GROUP[@]}/".tt_instance ]; then
-      INSTANCE=$(cat "${TOOL_GROUP[@]}/.tt_instance")
+      INSTANCE=$(cat "${TOOL_GROUP[@]}/.tt_instance"  )
       INSTANCE_UPPER=$(echo "$INSTANCE" | sed -e 's/\(.*\)/\U\1/g; s/\./_/g')
       KEY_VAR="IWC_API_KEY_$INSTANCE_UPPER"
-      PLANEMO_INSTANCE_OPTIONS="--galaxy_url '$INSTANCE' --galaxy_user_key '${!KEY_VAR}'"
+      PLANEMO_INSTANCE_OPTIONS="--galaxy_url 'https://$INSTANCE' --galaxy_user_key '${!KEY_VAR}'"
     else
       PLANEMO_INSTANCE_OPTIONS=""
     fi
