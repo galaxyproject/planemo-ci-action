@@ -163,15 +163,6 @@ if [ "$MODE" == "test" ]; then
   mkdir -p json_output
   touch .tt_biocontainer_skip
   
-  if [ -f .tt_instance ]; then
-    INSTANCE=$(cat .tt_instance)
-    INSTANCE_UPPER=$(echo $INSTANCE | sed -e 's/\(.*\)/\U\1/g; s/\./_/g')
-    KEY_VAR="IWC_API_KEY_"$INSTANCE_UPPER
-    PLANEMO_INSTANCE_OPTIONS="--galaxy_url '$INSTANCE' --galaxy_user_key '${!KEY_VAR}'"
-  else
-    PLANEMO_INSTANCE_OPTIONS=""
-  fi 
-
   while read -r -a TOOL_GROUP; do
     docker system prune --all --force --volumes || true
     # Check if any of the lines in .tt_biocontainer_skip is a substring of $TOOL_GROUP
@@ -182,9 +173,20 @@ if [ "$MODE" == "test" ]; then
     fi
     if [ "$WORKFLOWS" == "true" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
-    fi  
+    fi
+
+    if [ -f "${TOOL_GROUP[@]}/".tt_instance ]; then
+      INSTANCE=$(cat "${TOOL_GROUP[@]}/.tt_instance")
+      INSTANCE_UPPER=$(echo "$INSTANCE" | sed -e 's/\(.*\)/\U\1/g; s/\./_/g')
+      KEY_VAR="IWC_API_KEY_$INSTANCE_UPPER"
+      PLANEMO_INSTANCE_OPTIONS="--galaxy_url '$INSTANCE' --galaxy_user_key '${!KEY_VAR}'"
+    else
+      PLANEMO_INSTANCE_OPTIONS=""
+    fi
+
+
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" $PLANEMO_INSTANCE_OPTIONS || true
   done < tool_list_chunk.txt
 
   if [ ! -s tool_list_chunk.txt ]; then
