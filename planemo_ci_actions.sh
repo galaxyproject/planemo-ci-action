@@ -162,7 +162,6 @@ if [ "$MODE" == "test" ]; then
   # Test tools
   mkdir -p json_output
   touch .tt_biocontainer_skip
-  
   while read -r -a TOOL_GROUP; do
     docker system prune --all --force --volumes || true
     # Check if any of the lines in .tt_biocontainer_skip is a substring of $TOOL_GROUP
@@ -185,7 +184,6 @@ if [ "$MODE" == "test" ]; then
     else
       PLANEMO_INSTANCE_OPTIONS=()
     fi
-
 
     json=$(mktemp -u -p json_output --suff .json)
     PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" "${PLANEMO_INSTANCE_OPTIONS[@]}" || true
