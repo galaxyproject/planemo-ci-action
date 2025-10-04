@@ -175,18 +175,20 @@ if [ "$MODE" == "test" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
     fi
 
-    if [ -f "${TOOL_GROUP[@]}/".tt_instance ]; then
-      INSTANCE=$(cat "${TOOL_GROUP[@]}/.tt_instance"  )
+    ## TODO concatenating, ie TOOL_GROUP[*] might not work with multiple WF in a group
+    ## Can this happen?
+    if [ -f "${TOOL_GROUP[*]}/".tt_instance ]; then
+      INSTANCE=$(cat "${TOOL_GROUP[*]}/.tt_instance"  )
       # INSTANCE_UPPER=$(echo "$INSTANCE" | sed -e 's/\(.*\)/\U\1/g; s/\./_/g')
       # KEY_VAR="IWC_API_KEY_$INSTANCE_UPPER"
-      PLANEMO_INSTANCE_OPTIONS="--galaxy_url https://$INSTANCE --galaxy_user_key $GALAXY_USER_KEY"
+      PLANEMO_INSTANCE_OPTIONS=("--galaxy_url" "https://$INSTANCE" "--galaxy_user_key" "$GALAXY_USER_KEY")
     else
-      PLANEMO_INSTANCE_OPTIONS=""
+      PLANEMO_INSTANCE_OPTIONS=()
     fi
 
 
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" $PLANEMO_INSTANCE_OPTIONS || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" "${PLANEMO_INSTANCE_OPTIONS[@]}" || true
   done < tool_list_chunk.txt
 
   if [ ! -s tool_list_chunk.txt ]; then
