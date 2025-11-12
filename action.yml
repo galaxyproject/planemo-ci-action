@@ -112,7 +112,13 @@ runs:
     # Install the `wheel` package so that when installing other packages which
     # are not available as wheels, pip will build a wheel for them, which can be cached.
     - name: Install planemo
-      run: pip install wheel ${{ inputs.planemo-version }}
+      run: |
+        pip install wheel ${{ inputs.planemo-version }}
+        if [ "${{ inputs.galaxy-branch }}" ]; then
+          echo "Installing Galaxy packages from branch: ${{ inputs.galaxy-branch }}"
+          base="git+https://github.com/${{ inputs.galaxy-fork }}/galaxy.git@${{ inputs.galaxy-branch }}#subdirectory=packages"
+          pip install --force-reinstall "$base/util" "$base/tool_util_models" "$base/tool_util"
+        fi
       shell: bash
     - name: Install jq
       run: sudo apt-get install jq
