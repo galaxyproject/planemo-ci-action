@@ -114,8 +114,11 @@ runs:
     - name: Install planemo
       run: |
         pip install wheel ${{ inputs.planemo-version }}
-        if [[ "${{ inputs.galaxy-branch }}" != "master" ]]; then
-          echo "Installing Galaxy packages from branch: ${{ inputs.galaxy-branch }}"
+        # Install Galaxy packages from a custom fork/branch if specified.
+        # This allows testing against Galaxy development branches or forks.
+        # Only runs when both fork and branch are provided, and branch is not master/main.
+        if [[ "${{ inputs.galaxy-fork }}" != "" && "${{ inputs.galaxy-branch }}" != "" && "${{ inputs.galaxy-branch }}" != "master" && "${{ inputs.galaxy-branch }}" != "main" ]]; then
+          echo "Installing Galaxy packages from fork ${{ inputs.galaxy-fork }}, branch ${{ inputs.galaxy-branch }}"
           base="git+https://github.com/${{ inputs.galaxy-fork }}/galaxy.git@${{ inputs.galaxy-branch }}#subdirectory=packages"
           pip install --force-reinstall "$base/util" "$base/tool_util_models" "$base/tool_util"
         fi
