@@ -12,10 +12,10 @@ inputs:
     description: 'Set a specific planemo version or url. If not specified installs latest planemo release from PyPI'
     default: 'planemo'
   galaxy-branch:
-    description: 'Galaxy branch to use'
+    description: 'Galaxy branch to use. Affects both the pointing step and Galaxy package installation.'
     default: 'master'
   galaxy-fork:
-    description: 'Galaxy fork to use'
+    description: 'Galaxy fork to use. Affects both the pointing step and Galaxy package installation.'
     default: 'galaxyproject'
   python-version:
     description: 'Python version to use'
