@@ -89,8 +89,8 @@ Optional inputs:
 - `report_level`: all|warn|error (default: all)
 - `fail_level`: warn|error (default: error)
 - `additional-planemo-options`: additional options passed to `planemo lint`. [Here](https://github.com/galaxyproject/planemo-ci-action/blob/b8ede8dc7767a86ac8bae582554d18ea00863259/.github/workflows/tools.yaml#L179) this is used to overwrite the warn level of `planemo lint`.
-- `galaxy-branch`: Galaxy branch to use (default: `master`). Affects the pointing step and Galaxy package installation (for non-master/main branches).
-- `galaxy-fork`: Galaxy fork to use (default: `galaxyproject`). Affects the pointing step and Galaxy package installation (for non-master/main branches).
+- `galaxy-branch`: Galaxy branch to test against (default: `master`). Used for Galaxy package installation when testing with non-master/main branches.
+- `galaxy-fork`: Galaxy fork to test against (default: `galaxyproject`). Used for Galaxy package installation when testing with non-master/main branches.
 
 Output:
 
