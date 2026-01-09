@@ -12,10 +12,10 @@ inputs:
     description: 'Set a specific planemo version or url. If not specified installs latest planemo release from PyPI'
     default: 'planemo'
   galaxy-branch:
-    description: 'Galaxy branch to use'
+    description: 'Galaxy branch to use. Affects both the pointing step and Galaxy package installation.'
     default: 'master'
   galaxy-fork:
-    description: 'Galaxy fork to use'
+    description: 'Galaxy fork to use. Affects both the pointing step and Galaxy package installation.'
     default: 'galaxyproject'
   python-version:
     description: 'Python version to use'
@@ -112,7 +112,16 @@ runs:
     # Install the `wheel` package so that when installing other packages which
     # are not available as wheels, pip will build a wheel for them, which can be cached.
     - name: Install planemo
-      run: pip install wheel ${{ inputs.planemo-version }}
+      run: |
+        pip install wheel ${{ inputs.planemo-version }}
+        # Install Galaxy packages from a custom fork/branch if specified.
+        # This allows testing against Galaxy development branches or forks.
+        # Only runs when both fork and branch are provided, and branch is not master/main.
+        if [[ "${{ inputs.galaxy-fork }}" != "" && "${{ inputs.galaxy-branch }}" != "" && "${{ inputs.galaxy-branch }}" != "master" && "${{ inputs.galaxy-branch }}" != "main" ]]; then
+          echo "Installing Galaxy packages from fork ${{ inputs.galaxy-fork }}, branch ${{ inputs.galaxy-branch }}"
+          base="git+https://github.com/${{ inputs.galaxy-fork }}/galaxy.git@${{ inputs.galaxy-branch }}#subdirectory=packages"
+          pip install --force-reinstall "$base/util" "$base/tool_util_models" "$base/tool_util"
+        fi
       shell: bash
     - name: Install jq
       run: sudo apt-get install jq
