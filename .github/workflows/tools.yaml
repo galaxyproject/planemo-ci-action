@@ -116,8 +116,6 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 1
-    - name: Artificially exclude workflows (because ci_find_repos discovers tool and workflow repos)
-      run: echo 'test/workflows/' > .tt_skip
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
       uses: ./
       id: discover
