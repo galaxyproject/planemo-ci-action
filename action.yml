@@ -159,7 +159,7 @@ runs:
         ADDITIONAL_PLANEMO_OPTIONS: ${{ inputs.additional-planemo-options }}
         GALAXY_SLOTS: ${{ inputs.galaxy-slots }}
         TEST_TIMEOUT: ${{ inputs.test_timeout }}
-        GALAXY_USER_KEY: ${{ inputs.galaxy-user-key }}
+        # GALAXY_USER_KEY: ${{ inputs.galaxy-user-key }}
 
     - run: |
         echo 'repository-list<<EOF' >> $GITHUB_OUTPUT

@@ -44,6 +44,15 @@ Tools and workflows are discovered in all directories, except for `packages/` an
 
 A global `.lint_skip` file and per repo `.lint_skip` files can be used to list tool/workflow linters that should be skipped.
 
+For workflow repositories a `.wt_instance` contains the instance to run the workflow test against.
+In order to be able to use this an APII key for the instance needs to be passed to the test job
+via the `galaxy-user-key` parameter. At the moment only one instance is supported for the whole
+repository. 
+
+
+
+
+
 Setup mode
 ----------
 
