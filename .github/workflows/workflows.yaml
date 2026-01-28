@@ -238,7 +238,7 @@ jobs:
         chunk-count: ${{ needs.setup-ci-workflows.outputs.chunk-count }}
         # galaxy-user-key: ${{ secrets.GALAXY_USER_KEY }}
       env:
-        IWC_API_KEY_USEGALAXY_EU: ${{ secrets.GALAXY_USER_KEY }}
+        IWC_API_KEY_USEGALAXY_EU: ${{ secrets.IWC_API_KEY_USEGALAXY_EU }}
     - uses: actions/upload-artifact@v4
       with:
         name: 'Workflow test output ${{ matrix.chunk }}'
