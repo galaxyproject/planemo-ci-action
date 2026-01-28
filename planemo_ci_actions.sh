@@ -177,10 +177,9 @@ if [ "$MODE" == "test" ]; then
     ## TODO concatenating, ie TOOL_GROUP[*] might not work with multiple WF in a group
     ## Can this happen??
     if [ -f "${TOOL_GROUP[*]}/".wt_instance ]; then
-      INSTANCE=$(cat "${TOOL_GROUP[*]}/.wt_instance"  )
-      INSTANCE_UPPER=$(echo "$INSTANCE" | sed -e 's/\(.*\)/\U\1/g; s/\./_/g')
-      API_KEY_VAR="IWC_API_KEY_$INSTANCE_UPPER"
-      PLANEMO_INSTANCE_OPTIONS=("--galaxy_url" "https://$INSTANCE" "--galaxy_user_key" "${!API_KEY_VAR}")
+      INSTANCE=$(cat "${TOOL_GROUP[*]}/.wt_instance"  sed -e 's/\./_/g')
+      API_KEY=$(yq ".${INSTANCE}" <<<"$GALAXY_USER_KEY")
+      PLANEMO_INSTANCE_OPTIONS=("--galaxy_url" "https://$INSTANCE" "--galaxy_user_key" "$API_KEY")
     else
       PLANEMO_INSTANCE_OPTIONS=()
     fi
