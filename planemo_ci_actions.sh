@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -exo pipefail
+
+set -exuo pipefail
 
 PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION" --test_timeout "$TEST_TIMEOUT")
 PLANEMO_CONTAINER_DEPENDENCIES=("--biocontainers" "--no_dependency_resolution" "--no_conda_auto_init" "--docker_extra_volume" "./")
@@ -178,7 +179,10 @@ if [ "$MODE" == "test" ]; then
     ## Can this happen??
     if [ -f "${TOOL_GROUP[*]}/".wt_instance ]; then
       INSTANCE=$(cat "${TOOL_GROUP[*]}/.wt_instance")
+      set +x
       export PLANEMO_GALAXY_USER_KEY="$(jq -r --arg instance "$INSTANCE" '.[$instance]' <<<"$GALAXY_USER_KEY")"
+      echo "::add-mask::$PLANEMO_GALAXY_USER_KEY"
+      set -x
       PLANEMO_INSTANCE_OPTIONS=("--galaxy_url" "https://$INSTANCE")
     else
       PLANEMO_INSTANCE_OPTIONS=()
