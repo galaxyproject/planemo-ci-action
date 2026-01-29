@@ -180,17 +180,16 @@ if [ "$MODE" == "test" ]; then
     if [ -f "${TOOL_GROUP[*]}/".wt_instance ]; then
       INSTANCE=$(cat "${TOOL_GROUP[*]}/.wt_instance")
       set +x
-      PLANEMO_GALAXY_USER_KEY="$(jq -r --arg instance "$INSTANCE" '.[$instance]' <<<"$GALAXY_USER_KEY")"
+      PLANEMO_GALAXY_USER_KEY="$(jq -r --arg instance "$INSTANCE" '.[$instance]' <<<"$GALAXY_USER_KEY" || $GALAXY_USER_KEY)"
       export PLANEMO_GALAXY_USER_KEY
       echo "::add-mask::$PLANEMO_GALAXY_USER_KEY"
       set -x
-      PLANEMO_INSTANCE_OPTIONS=("--galaxy_url" "https://$INSTANCE")
-    else
-      PLANEMO_INSTANCE_OPTIONS=()
+      PLANEMO_OPTIONS=("--galaxy_url" "https://$INSTANCE")
+      PLANEMO_TEST_OPTIONS=()
     fi
 
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" "${PLANEMO_INSTANCE_OPTIONS[@]}" || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
   done < tool_list_chunk.txt
 
   if [ ! -s tool_list_chunk.txt ]; then
