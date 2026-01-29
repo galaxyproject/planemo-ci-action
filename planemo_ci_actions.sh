@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -exo pipefail
 
 PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION" --test_timeout "$TEST_TIMEOUT")
@@ -172,7 +173,21 @@ if [ "$MODE" == "test" ]; then
     fi
     if [ "$WORKFLOWS" == "true" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
-    fi  
+    fi
+
+    ## TODO concatenating, ie TOOL_GROUP[*] might not work with multiple WF in a group
+    ## Can this happen??
+    if [ -f "${TOOL_GROUP[*]}/".wt_instance ]; then
+      INSTANCE=$(cat "${TOOL_GROUP[*]}/.wt_instance")
+      set +x
+      PLANEMO_GALAXY_USER_KEY="$(jq -r --arg instance "$INSTANCE" '.[$instance]' <<<"$GALAXY_USER_KEY" || $GALAXY_USER_KEY)"
+      export PLANEMO_GALAXY_USER_KEY
+      echo "::add-mask::$PLANEMO_GALAXY_USER_KEY"
+      set -x
+      PLANEMO_OPTIONS=("--galaxy_url" "https://$INSTANCE")
+      PLANEMO_TEST_OPTIONS=()
+    fi
+
     json=$(mktemp -u -p json_output --suff .json)
     PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
   done < tool_list_chunk.txt
