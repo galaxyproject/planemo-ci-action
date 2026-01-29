@@ -115,7 +115,6 @@ runs:
     # are not available as wheels, pip will build a wheel for them, which can be cached.
     - name: Install planemo
       run: |
-        apt install yq
         pip install wheel ${{ inputs.planemo-version }}
         # Install Galaxy packages from a custom fork/branch if specified.
         # This allows testing against Galaxy development branches or forks.
