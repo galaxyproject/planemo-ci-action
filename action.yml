@@ -77,6 +77,9 @@ inputs:
   test_timeout:
     description: 'Maximum runtime of a single test in seconds, default: 0 means unlimited'
     default: 86400
+  previous-run-id:
+    description: 'Run ID of a previous workflow run to re-run failed tests from (used with mode: retest)'
+    default: ''
   # inputs that are needed for testing this action
   # not supposed to be used
   github-event-name-override:
@@ -160,6 +163,7 @@ runs:
         GALAXY_SLOTS: ${{ inputs.galaxy-slots }}
         TEST_TIMEOUT: ${{ inputs.test_timeout }}
         GALAXY_USER_KEY: ${{ inputs.galaxy-user-key }}
+        PREVIOUS_RUN_ID: ${{ inputs.previous-run-id }}
 
     - run: |
         echo 'repository-list<<EOF' >> $GITHUB_OUTPUT

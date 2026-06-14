@@ -222,6 +222,71 @@ if [ "$MODE" == "combine" ]; then
   jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | sed 's/"//g' | sort | uniq -c > statistics.txt
 fi
 
+# retest mode
+# - download artifact from a previous run using gh CLI
+# - for each chunk, re-run only the failed tests
+if [ "$MODE" == "retest" ]; then
+  if [ -z "$PREVIOUS_RUN_ID" ]; then
+    echo "PREVIOUS_RUN_ID must be set for retest mode" >&2
+    exit 1
+  fi
+
+  if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
+    "$GITHUB_ACTION_PATH"/cvmfs/setup_cvmfs.sh
+  fi
+
+  # Download the artifact for this specific chunk from the previous run
+  GH_TOKEN=$GITHUB_TOKEN gh run download "$PREVIOUS_RUN_ID" \
+    --name "Tool test output $CHUNK" \
+    --dir previous_run_results
+
+  PREVIOUS_JSON="previous_run_results/tool_test_output.json"
+  if [ ! -f "$PREVIOUS_JSON" ]; then
+    echo "No tool_test_output.json found in previous run artifact for chunk $CHUNK" >&2
+    exit 1
+  fi
+
+  # Find the same tools for this chunk as the original run
+  touch tool_list_chunk.txt
+  if [ -s repository_list.txt ]; then
+    mapfile -t REPO_ARRAY < repository_list.txt
+    if [ "$WORKFLOWS" != "true" ]; then
+      planemo ci_find_tools --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" --group_tools --output tool_list_chunk.txt "${REPO_ARRAY[@]}"
+    else
+      planemo ci_find_repos --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" --output tool_list_chunk.txt "${REPO_ARRAY[@]}"
+    fi
+  fi
+
+  cat tool_list_chunk.txt
+
+  mkdir -p json_output
+  touch .tt_biocontainer_skip
+  while read -r -a TOOL_GROUP; do
+    docker system prune --all --force --volumes || true
+    if echo "${TOOL_GROUP[@]}" | grep -qf .tt_biocontainer_skip; then
+      PLANEMO_OPTIONS=()
+    else
+      PLANEMO_OPTIONS=("${PLANEMO_CONTAINER_DEPENDENCIES[@]}")
+    fi
+    if [ "$WORKFLOWS" == "true" ]; then
+      PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
+    fi
+    json=$(mktemp -u -p json_output --suff .json)
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" \
+      --failed --failed_json "$PREVIOUS_JSON" \
+      --test_output_json "$json" \
+      "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
+  done < tool_list_chunk.txt
+
+  if [ ! -s tool_list_chunk.txt ]; then
+    echo '{"tests":[]}' > "$(mktemp -u -p json_output --suff .json)"
+  fi
+
+  planemo merge_test_reports json_output/*.json tool_test_output.json
+  planemo test_reports tool_test_output.json --test_output tool_test_output.html
+  mv tool_test_output.json tool_test_output.html upload/
+fi
+
 # check outputs mode
 # - check if there were unsuccessful tests
 if [ "$MODE" == "check" ]; then
