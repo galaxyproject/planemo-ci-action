@@ -182,6 +182,10 @@ jobs:
     name: Test testing of workflows
     needs: [setup-ci-workflows]
     runs-on: ubuntu-latest
+    # example3 carries a .wt_instance file pointing at usegalaxy.org, so this
+    # job tests against that external instance and needs GALAXY_USER_KEY, which
+    # is only available through the pr-secrets environment.
+    environment: pr-secrets
     strategy:
       fail-fast: false
       matrix:
