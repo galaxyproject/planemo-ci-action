@@ -78,7 +78,7 @@ inputs:
     description: 'Maximum runtime of a single test in seconds, default: 0 means unlimited'
     default: 86400
   previous-run-id:
-    description: 'Run ID of a previous workflow run to re-run failed tests from (used with mode: retest)'
+    description: 'Run ID of a previous workflow run to re-run only failed tests from (used with mode: test). Requires the gh CLI and github-token.'
     default: ''
   # inputs that are needed for testing this action
   # not supposed to be used
