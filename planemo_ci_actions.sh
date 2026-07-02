@@ -146,6 +146,25 @@ if [ "$MODE" == "test" ]; then
     "$GITHUB_ACTION_PATH"/cvmfs/setup_cvmfs.sh
   fi
 
+  # Retest: if a previous run id is given, download that run's artifact for this
+  # chunk and restrict the test run to the previously-failed test cases via
+  # `--failed --failed_json`. When PREVIOUS_RUN_ID is empty this is a no-op and a
+  # regular full test run is performed.
+  RETEST_OPTIONS=()
+  if [ -n "$PREVIOUS_RUN_ID" ]; then
+    # gh is preinstalled on GitHub-hosted runners; guard for self-hosted runners.
+    command -v gh >/dev/null 2>&1 || { echo "gh CLI is required for retest (previous-run-id) but was not found" >&2; exit 1; }
+    GH_TOKEN=$GITHUB_TOKEN gh run download "$PREVIOUS_RUN_ID" \
+      --name "Tool test output $CHUNK" \
+      --dir previous_run_results
+    PREVIOUS_JSON="previous_run_results/tool_test_output.json"
+    if [ ! -f "$PREVIOUS_JSON" ]; then
+      echo "No tool_test_output.json found in previous run artifact for chunk $CHUNK" >&2
+      exit 1
+    fi
+    RETEST_OPTIONS=("--failed" "--failed_json" "$PREVIOUS_JSON")
+  fi
+
   # Find tools for chunk
   touch tool_list_chunk.txt
   if [ -s repository_list.txt ]; then
@@ -189,7 +208,7 @@ if [ "$MODE" == "test" ]; then
     fi
 
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" "${RETEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
   done < tool_list_chunk.txt
 
   if [ ! -s tool_list_chunk.txt ]; then

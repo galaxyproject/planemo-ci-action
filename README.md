@@ -137,10 +137,65 @@ Optional inputs:
 - `galaxy-slots`: number of slots (threads) to use in Galaxy jobs (sets the `GALAXY_SLOTS` environment variable)
 - `test_timeout`:  Maximum runtime of a single test in seconds, default: 86400
 - `galaxy-user-key`: API key(s) used for testing agains online instances (note: use secrets for this). See "Assumptions on the repository".
+- `previous-run-id`: re-run only previously-failed tests (see "Retesting only previously-failed tests" below).
+- `github-token`: GitHub token used to download the previous run's artifacts (only needed together with `previous-run-id`).
 
 Output:
 
 The test mode creates a directory `upload/` containing the test results as json file.
+
+### Retesting only previously-failed tests
+
+Set `previous-run-id` to the run ID of an earlier run to re-test only the test cases
+that failed in that run instead of running the full test suite. When set, test mode:
+
+- downloads that run's `Tool test output {chunk}` artifact via `gh run download`
+  (the `gh` CLI is preinstalled on GitHub-hosted runners; on self-hosted runners it must
+  be installed. A valid `github-token` must be passed);
+- restricts the run to the previously-failed test cases via `planemo test --failed
+  --failed_json`, so only failed tests are submitted to the engine.
+
+The caller must pass the same `repository-list`, `chunk-count`, and `chunk` as the
+original run so that the identical tool groups are reconstructed. This requires planemo
+≥ the release that ships the `--failed`/`--failed_json` flags (see
+[galaxyproject/planemo#1653](https://github.com/galaxyproject/planemo/pull/1653)).
+
+The output is identical to a regular test run (a `tool_test_output.json`/`.html`
+uploaded as `Tool test output {chunk}`), so the `combine` and `check` modes work
+unchanged downstream.
+
+Example `workflow_dispatch` job:
+
+```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      rerun-run-id:
+        description: 'Run ID of the previous run to re-test failures from'
+        required: true
+        type: string
+
+jobs:
+  retest:
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: ${{ fromJson(needs.setup.outputs.chunk-list) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: galaxyproject/planemo-ci-action@main
+        with:
+          mode: test
+          repository-list: ${{ needs.setup.outputs.repository-list }}
+          chunk: ${{ matrix.chunk }}
+          chunk-count: ${{ needs.setup.outputs.chunk-count }}
+          previous-run-id: ${{ inputs.rerun-run-id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 'Tool test output ${{ matrix.chunk }}'
+          path: upload
+```
 
 Combine test outputs mode
 -------------------------
