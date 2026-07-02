@@ -57,6 +57,9 @@ but multiple ones may be used for the whole repo) the secret can be json formatt
 }
 ```
 
+In order to be usable in pull requests from forks the secret should be stored as environment secrets and the test step should be assigned this environment, i.e. 
+the test step will require approval. 
+
 Setup mode
 ----------
 
