@@ -209,6 +209,10 @@ if [ "$MODE" == "test" ]; then
       INSTANCE=$(cat "${TOOL_GROUP[*]}/.wt_instance")
       set +x
       PLANEMO_GALAXY_USER_KEY="$(jq -r --arg instance "$INSTANCE" '.[$instance]' <<<"$GALAXY_USER_KEY" || echo "$GALAXY_USER_KEY")"
+      if [ -z "$PLANEMO_GALAXY_USER_KEY" ] || [ "$PLANEMO_GALAXY_USER_KEY" == "null" ]; then
+        echo "::error::No API key for $INSTANCE (needed by ${TOOL_GROUP[*]}) in galaxy-user-key. Note that secrets are not passed to pull_request runs from forks."
+        exit 1
+      fi
       export PLANEMO_GALAXY_USER_KEY
       echo "::add-mask::$PLANEMO_GALAXY_USER_KEY"
       set -x
