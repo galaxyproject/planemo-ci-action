@@ -2,6 +2,9 @@ on: [push, pull_request]
 
 name: 'Test action for tools'
 
+permissions:
+  contents: read
+
 env:
   GALAXY_FORK: galaxyproject
   GALAXY_BRANCH: master
