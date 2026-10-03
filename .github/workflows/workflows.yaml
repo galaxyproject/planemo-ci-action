@@ -238,6 +238,9 @@ jobs:
         fetch-depth: 1
         ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || '' }}
         persist-credentials: false
+        # checking out fork PR code on pull_request_target is the point of this
+        # job; it only runs after the pr-secrets approval (see top of file)
+        allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
@@ -293,6 +296,9 @@ jobs:
         fetch-depth: 1
         ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || '' }}
         persist-credentials: false
+        # checking out fork PR code on pull_request_target is the point of this
+        # job; it only runs after the pr-secrets approval (see top of file)
+        allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
     - uses: actions/download-artifact@v4
       with:
         path: artifacts
