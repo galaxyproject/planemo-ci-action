@@ -4,7 +4,10 @@ set -exo pipefail
 
 PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION" --test_timeout "$TEST_TIMEOUT")
 PLANEMO_CONTAINER_DEPENDENCIES=("--biocontainers" "--no_dependency_resolution" "--no_conda_auto_init" "--docker_extra_volume" "./")
-PLANEMO_WORKFLOW_OPTIONS=("--tool_data_table" "/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/idc.galaxyproject.org/config/tool_data_table_conf.xml" "--docker_extra_volume" "/cvmfs")
+PLANEMO_WORKFLOW_OPTIONS=()
+# Tool data tables published on CVMFS; added to the workflow test options in
+# test mode if present (planemo rejects --tool_data_table paths that don't exist).
+CVMFS_TOOL_DATA_TABLES=("/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "/cvmfs/idc.galaxyproject.org/config/tool_data_table_conf.xml")
 # Persist shed-install state across the per-line `planemo test` invocations of a
 # chunk. --shed_data_dir (planemo >= 0.75.45) also persists the shed tool-data-table
 # and data-manager configs, so reused tools keep their registered data tables
@@ -153,6 +156,25 @@ if [ "$MODE" == "test" ]; then
 
   if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
     "$GITHUB_ACTION_PATH"/cvmfs/setup_cvmfs.sh
+  fi
+
+  # Use the CVMFS tool data tables that are available, e.g. mounted by
+  # setup-cvmfs, by a previous step or on a self-hosted runner. With setup-cvmfs
+  # they must all be present, so a failed mount doesn't go unnoticed.
+  if [ "$WORKFLOWS" == "true" ]; then
+    for table in "${CVMFS_TOOL_DATA_TABLES[@]}"; do
+      if [ -f "$table" ]; then
+        PLANEMO_WORKFLOW_OPTIONS+=(--tool_data_table "$table")
+      elif [ "$SETUP_CVMFS" == "true" ]; then
+        echo "::error::CVMFS tool data table $table not found after setup-cvmfs"
+        exit 1
+      else
+        echo "::notice::CVMFS tool data table $table not found, not using it"
+      fi
+    done
+    if [ -d /cvmfs ]; then
+      PLANEMO_WORKFLOW_OPTIONS+=(--docker_extra_volume /cvmfs)
+    fi
   fi
 
   # Retest: if a previous run id is given, download that run's artifact for this
