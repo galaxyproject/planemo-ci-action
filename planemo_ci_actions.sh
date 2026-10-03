@@ -206,7 +206,7 @@ if [ "$MODE" == "test" ]; then
     ## TODO concatenating, ie TOOL_GROUP[*] might not work with multiple WF in a group
     ## Can this happen??
     if [ -f "${TOOL_GROUP[*]}/".wt_instance ]; then
-      INSTANCE=$(cat "${TOOL_GROUP[*]}/.wt_instance")
+      INSTANCE=$(tr -d '\r\n' < "${TOOL_GROUP[*]}/.wt_instance")
       set +x
       PLANEMO_GALAXY_USER_KEY="$(jq -r --arg instance "$INSTANCE" '.[$instance]' <<<"$GALAXY_USER_KEY" || echo "$GALAXY_USER_KEY")"
       if [ -z "$PLANEMO_GALAXY_USER_KEY" ] || [ "$PLANEMO_GALAXY_USER_KEY" == "null" ]; then

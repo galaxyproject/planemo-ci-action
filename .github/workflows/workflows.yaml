@@ -15,6 +15,12 @@ name: 'Test action for workflows'
 permissions:
   contents: read
 
+# Cancel superseded pull_request_target runs of a PR, so only the run for the
+# latest commit can be approved.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
+
 env:
   GALAXY_FORK: galaxyproject
   GALAXY_BRANCH: master
@@ -37,11 +43,13 @@ jobs:
         python-version: [3.11]
     steps:
     - name: Print github context properties
+      env:
+        HEAD_REF: ${{ github.head_ref }}
       run: |
         echo 'event: ${{ github.event_name }}'
         echo 'sha: ${{ github.sha }}'
         echo 'ref: ${{ github.ref }}'
-        echo 'head_ref: ${{ github.head_ref }}'
+        echo "head_ref: $HEAD_REF"
         echo 'base_ref: ${{ github.base_ref }}'
         echo 'event.before: ${{ github.event.before }}'
         echo 'event.after: ${{ github.event.after }}'
@@ -233,9 +241,10 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Cache .cache/pip
-      uses: actions/cache@v3
-      id: cache-pip
+    # restore only: on pull_request_target this job runs PR code, which must not
+    # save into the base branch cache scope
+    - name: Restore .cache/pip
+      uses: actions/cache/restore@v4
       with:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-ci-workflows.outputs.galaxy-head-sha }}
@@ -290,12 +299,11 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Cache .cache/pip
-      uses: actions/cache@v3
-      id: cache-pip
+    - name: Restore .cache/pip
+      uses: actions/cache/restore@v4
       with:
         path: ~/.cache/pip
-        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-ci-tools.outputs.galaxy-head-sha }}
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-ci-workflows.outputs.galaxy-head-sha }}
     - name: Combine outputs
       uses: ./
       id: combine
