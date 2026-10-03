@@ -57,7 +57,7 @@ inputs:
     description: "Planemo lint fail level"
     default: 'error'
   setup-cvmfs:
-    description: "Setup CVMFS mount for main.galaxyproject.org and data.galaxyproject.org"
+    description: "Setup CVMFS mount for main.galaxyproject.org, data.galaxyproject.org and idc.galaxyproject.org"
     default: false
   workflows:
     description: "CI for workflows instead of tools"

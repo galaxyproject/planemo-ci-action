@@ -4,7 +4,7 @@ set -exo pipefail
 
 PLANEMO_TEST_OPTIONS=("--database_connection" "$DATABASE_CONNECTION" "--galaxy_source" "https://github.com/$GALAXY_FORK/galaxy" "--galaxy_branch" "$GALAXY_BRANCH" "--galaxy_python_version" "$PYTHON_VERSION" --test_timeout "$TEST_TIMEOUT")
 PLANEMO_CONTAINER_DEPENDENCIES=("--biocontainers" "--no_dependency_resolution" "--no_conda_auto_init" "--docker_extra_volume" "./")
-PLANEMO_WORKFLOW_OPTIONS=("--tool_data_table" "/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "--docker_extra_volume" "/cvmfs")
+PLANEMO_WORKFLOW_OPTIONS=("--tool_data_table" "/cvmfs/data.galaxyproject.org/managed/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/data.galaxyproject.org/byhand/location/tool_data_table_conf.xml" "--tool_data_table" "/cvmfs/idc.galaxyproject.org/config/tool_data_table_conf.xml" "--docker_extra_volume" "/cvmfs")
 # Persist shed-install state across the per-line `planemo test` invocations of a
 # chunk. --shed_data_dir (planemo >= 0.75.45) also persists the shed tool-data-table
 # and data-manager configs, so reused tools keep their registered data tables

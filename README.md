@@ -123,7 +123,8 @@ Required inputs:
 
 - `repository-list`: List of repositories
 - `workflows`: test workflows
-- `setup-cvmfs`: setup CVMFS (only useful for testing workflows)
+- `setup-cvmfs`: setup CVMFS mounts for main.galaxyproject.org, data.galaxyproject.org and
+  idc.galaxyproject.org (only useful for testing workflows)
 - `chunk`: Current chunk
 - `chunk-count`: Maximum chunk
 

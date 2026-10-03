@@ -14,5 +14,7 @@ sudo cp galaxyproject.org.conf  /etc/cvmfs/domain.d/galaxyproject.org.conf
 sudo cp ./*.galaxyproject.org.pub /etc/cvmfs/keys/
 sudo mkdir -p /cvmfs/main.galaxyproject.org
 sudo mkdir -p /cvmfs/data.galaxyproject.org
+sudo mkdir -p /cvmfs/idc.galaxyproject.org
 sudo mount -t cvmfs main.galaxyproject.org /cvmfs/main.galaxyproject.org
 sudo mount -t cvmfs data.galaxyproject.org /cvmfs/data.galaxyproject.org
+sudo mount -t cvmfs idc.galaxyproject.org /cvmfs/idc.galaxyproject.org

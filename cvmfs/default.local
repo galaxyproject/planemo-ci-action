@@ -1,4 +1,4 @@
-CVMFS_REPOSITORIES="data.galaxyproject.org,main.galaxyproject.org"
+CVMFS_REPOSITORIES="data.galaxyproject.org,main.galaxyproject.org,idc.galaxyproject.org"
 CVMFS_HTTP_PROXY="DIRECT"
 CVMFS_QUOTA_LIMIT="4000"
 CVMFS_USE_GEOAPI=yes
