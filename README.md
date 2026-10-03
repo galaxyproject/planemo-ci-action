@@ -138,6 +138,8 @@ Optional inputs:
 - `galaxy-slots`: number of slots (threads) to use in Galaxy jobs (sets the `GALAXY_SLOTS` environment variable)
 - `test_timeout`:  Maximum runtime of a single test in seconds, default: 86400
 - `galaxy-user-key`: API key(s) used for testing agains online instances (note: use secrets for this). See "Assumptions on the repository".
+  The test fails if a workflow's instance has no key. Note that GitHub does not pass secrets to
+  `pull_request` runs from forks; see `.github/workflows/workflows.yaml` for a `pull_request_target` setup.
 - `previous-run-id`: re-run only previously-failed tests (see "Retesting only previously-failed tests" below).
 - `github-token`: GitHub token used to download the previous run's artifacts (only needed together with `previous-run-id`).
 
