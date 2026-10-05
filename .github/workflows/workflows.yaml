@@ -264,6 +264,11 @@ jobs:
         chunk: ${{ matrix.chunk }}
         chunk-count: ${{ needs.setup-ci-workflows.outputs.chunk-count }}
         galaxy-user-key: ${{ secrets.GALAXY_USER_KEY }}
+    - name: Check CVMFS mounts
+      run: |
+        mount | grep cvmfs
+        ls /cvmfs/idc.galaxyproject.org/config/
+        ls /cvmfs/idc.galaxyproject.org/config/samestr_db.loc
     - name: 2nd run test workflows
       uses: ./
       id: test-workflows-2
