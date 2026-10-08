@@ -8,6 +8,9 @@ inputs:
   create-cache: 
     description: 'Set false if creating a cache is not needed'
     default: false
+  mulled-cache-seed:
+    description: 'Path to an index of the biocontainers namespace. Setup mode writes it, test mode seeds the mulled resolution cache with it.'
+    default: ''
   planemo-version:
     description: 'Set a specific planemo version or url. If not specified installs latest planemo release from PyPI'
     default: 'planemo'
@@ -137,6 +140,7 @@ runs:
       env:
         EVENT_BEFORE: ${{ github.event.before }}
         CREATE_CACHE: ${{ inputs.create-cache }}
+        MULLED_CACHE_SEED: ${{ inputs.mulled-cache-seed }}
         GALAXY_BRANCH: ${{ inputs.galaxy-branch }}
         GALAXY_FORK: ${{ inputs.galaxy-fork }}
         PYTHON_VERSION: ${{ inputs.python-version }}

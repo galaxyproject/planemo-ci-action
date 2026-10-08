@@ -81,6 +81,7 @@ Optional inputs:
 - `galaxy-source` (default `galaxyproject`)
 - `max-chunks` (default `20`)
 - `python-version` (default `"3.11"`)
+- `mulled-cache-seed`: path to write an index of the biocontainers namespace to (with `mulled-cache`). Pass it on to the test mode, e.g. as an artifact.
 
 Outputs:
 
@@ -140,6 +141,7 @@ Optional inputs:
 - `galaxy-user-key`: API key(s) used for testing agains online instances (note: use secrets for this). See "Assumptions on the repository".
   The test fails if a workflow's instance has no key. Note that GitHub does not pass secrets to
   `pull_request` runs from forks; see `.github/workflows/workflows.yaml` for a `pull_request_target` setup.
+- `mulled-cache-seed`: path to the index written in setup mode. It seeds Galaxy's mulled resolution cache, so that the chunks don't each list the biocontainers namespace via the quay.io API.
 - `previous-run-id`: re-run only previously-failed tests (see "Retesting only previously-failed tests" below).
 - `github-token`: GitHub token used to download the previous run's artifacts (only needed together with `previous-run-id`).
 
