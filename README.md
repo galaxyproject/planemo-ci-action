@@ -72,6 +72,8 @@ This mode runs if no other mode is selected. It:
 
 - calulates the number of chunks to use for tool testing and the
   list of chunks
+- indexes the biocontainers namespace for the test chunks (see `mulled-cache-seed`).
+  The index is passed on with `actions/cache`, so this action uses `actions/cache/save` and `actions/cache/restore`.
 
 Optional inputs: 
 
