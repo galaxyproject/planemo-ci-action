@@ -9,8 +9,8 @@ inputs:
     description: 'Set false if creating a cache is not needed'
     default: false
   mulled-cache-seed:
-    description: 'Path to an index of the biocontainers namespace. Setup mode writes it, test mode seeds the mulled resolution cache with it.'
-    default: ''
+    description: 'Index the biocontainers namespace once in setup mode and seed the mulled resolution cache of the test chunks with it (passed on via the Actions cache). Set false to disable.'
+    default: true
   planemo-version:
     description: 'Set a specific planemo version or url. If not specified installs latest planemo release from PyPI'
     default: 'planemo'
@@ -134,13 +134,24 @@ runs:
     - name: Install jq
       run: sudo apt-get install jq
       shell: bash
+    # The biocontainers index written in setup mode. Falls back to an earlier
+    # attempt of this run, e.g. for "Re-run failed jobs".
+    - name: Restore biocontainers index
+      if: inputs.mode == 'test' && inputs.mulled-cache-seed != 'false'
+      uses: actions/cache/restore@v6
+      continue-on-error: true
+      with:
+        path: ${{ runner.temp }}/mulled-cache-seed/biocontainers.json
+        key: mulled-cache-seed-${{ github.run_id }}-${{ github.run_attempt }}
+        restore-keys: mulled-cache-seed-${{ github.run_id }}-
     - name: run planemo actions
+      id: planemo
       run: ${{ github.action_path }}/planemo_ci_actions.sh
       shell: bash
       env:
         EVENT_BEFORE: ${{ github.event.before }}
         CREATE_CACHE: ${{ inputs.create-cache }}
-        MULLED_CACHE_SEED: ${{ inputs.mulled-cache-seed }}
+        MULLED_CACHE_SEED: ${{ inputs.mulled-cache-seed != 'false' && format('{0}/mulled-cache-seed/biocontainers.json', runner.temp) || '' }}
         GALAXY_BRANCH: ${{ inputs.galaxy-branch }}
         GALAXY_FORK: ${{ inputs.galaxy-fork }}
         PYTHON_VERSION: ${{ inputs.python-version }}
@@ -196,3 +207,10 @@ runs:
         echo 'EOF' >> $GITHUB_OUTPUT
       id: statistics
       shell: bash
+    - name: Save biocontainers index
+      if: inputs.mode == 'setup' && steps.planemo.outputs.mulled-cache-seed == 'true'
+      uses: actions/cache/save@v6
+      continue-on-error: true
+      with:
+        path: ${{ runner.temp }}/mulled-cache-seed/biocontainers.json
+        key: mulled-cache-seed-${{ github.run_id }}-${{ github.run_attempt }}

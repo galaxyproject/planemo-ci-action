@@ -119,12 +119,13 @@ else
 fi
 
 # index the biocontainers namespace once, so that the test chunks don't
-# each have to list it via the quay.io API
-if [ "$MODE" == "setup" ] && [ -n "$MULLED_CACHE_SEED" ] && [ -s repository_list.txt ]; then
-  if ! mulled-cache --namespace biocontainers --output "$MULLED_CACHE_SEED"; then
+# each have to list it via the quay.io API (a single chunk lists it once
+# itself, so there is nothing to save then)
+if [ "$MODE" == "setup" ] && [ -n "$MULLED_CACHE_SEED" ] && [ -s repository_list.txt ] && [ "$CHUNK_COUNT" -gt 1 ]; then
+  if mulled-cache --namespace biocontainers --output "$MULLED_CACHE_SEED"; then
+    echo "mulled-cache-seed=true" >> "$GITHUB_OUTPUT"
+  else
     echo "::warning::Could not index the biocontainers namespace, test chunks will query quay.io themselves"
-    mkdir -p "$(dirname "$MULLED_CACHE_SEED")"
-    echo '{"namespace": "biocontainers", "repositories": []}' > "$MULLED_CACHE_SEED"
   fi
 fi
 
@@ -169,7 +170,7 @@ if [ "$MODE" == "test" ]; then
       # Beaker is a dependency of Galaxy, but not of planemo
       PIP_QUIET=1 pip install Beaker && python "$GITHUB_ACTION_PATH"/seed_mulled_cache.py "$MULLED_CACHE_SEED" "$HOME/.planemo/mulled_resolution_cache" || echo "::warning::Could not seed the mulled resolution cache"
     else
-      echo "::warning::mulled-cache-seed $MULLED_CACHE_SEED not found, Galaxy will query quay.io itself"
+      echo "No biocontainers index from setup mode, Galaxy will query quay.io itself"
     fi
   fi
 
