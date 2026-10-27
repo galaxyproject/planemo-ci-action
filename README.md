@@ -72,6 +72,8 @@ This mode runs if no other mode is selected. It:
 
 - calulates the number of chunks to use for tool testing and the
   list of chunks
+- indexes the biocontainers namespace for the test chunks (see `mulled-cache-seed`).
+  The index is passed on with `actions/cache`, so this action uses `actions/cache/save` and `actions/cache/restore`.
 
 Optional inputs: 
 
@@ -81,6 +83,7 @@ Optional inputs:
 - `galaxy-source` (default `galaxyproject`)
 - `max-chunks` (default `20`)
 - `python-version` (default `"3.11"`)
+- `mulled-cache-seed` (default `true`): if there is more than one chunk, index the biocontainers namespace with `mulled-cache` and save it to the Actions cache (key `mulled-cache-seed-<run id>-<run attempt>`) for the test chunks of this run. Set `false` to disable.
 
 Outputs:
 
@@ -140,6 +143,7 @@ Optional inputs:
 - `galaxy-user-key`: API key(s) used for testing agains online instances (note: use secrets for this). See "Assumptions on the repository".
   The test fails if a workflow's instance has no key. Note that GitHub does not pass secrets to
   `pull_request` runs from forks; see `.github/workflows/workflows.yaml` for a `pull_request_target` setup.
+- `mulled-cache-seed` (default `true`): restore the index saved in setup mode and seed Galaxy's mulled resolution cache with it, so that the chunks don't each list the biocontainers namespace via the quay.io API. Set `false` to disable.
 - `previous-run-id`: re-run only previously-failed tests (see "Retesting only previously-failed tests" below).
 - `github-token`: GitHub token used to download the previous run's artifacts (only needed together with `previous-run-id`).
 

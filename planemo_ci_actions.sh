@@ -118,6 +118,17 @@ else
   echo -n "$CHUNK_COUNT" > chunk_count.txt
 fi
 
+# index the biocontainers namespace once, so that the test chunks don't
+# each have to list it via the quay.io API (a single chunk lists it once
+# itself, so there is nothing to save then)
+if [ "$MODE" == "setup" ] && [ -n "$MULLED_CACHE_SEED" ] && [ -s repository_list.txt ] && [ "$CHUNK_COUNT" -gt 1 ]; then
+  if mulled-cache --namespace biocontainers --output "$MULLED_CACHE_SEED"; then
+    echo "mulled-cache-seed=true" >> "$GITHUB_OUTPUT"
+  else
+    echo "::warning::Could not index the biocontainers namespace, test chunks will query quay.io themselves"
+  fi
+fi
+
 # lint mode
 # - call `planemo lint` for each repo
 # - check if each tool is in a repo (i.e. if `.shed.yml` is present)
@@ -153,6 +164,15 @@ fi
 # - run `planemo test` each tool group
 # - merge the test reports for the tool groups
 if [ "$MODE" == "test" ]; then
+
+  if [ -n "$MULLED_CACHE_SEED" ]; then
+    if [ -s "$MULLED_CACHE_SEED" ]; then
+      # Beaker is a dependency of Galaxy, but not of planemo
+      PIP_QUIET=1 pip install Beaker && python "$GITHUB_ACTION_PATH"/seed_mulled_cache.py "$MULLED_CACHE_SEED" "$HOME/.planemo/mulled_resolution_cache" || echo "::warning::Could not seed the mulled resolution cache"
+    else
+      echo "No biocontainers index from setup mode, Galaxy will query quay.io itself"
+    fi
+  fi
 
   if [ "$WORKFLOWS" == "true" ] && [ "$SETUP_CVMFS" == "true" ]; then
     "$GITHUB_ACTION_PATH"/cvmfs/setup_cvmfs.sh
