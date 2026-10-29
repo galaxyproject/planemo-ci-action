@@ -149,6 +149,7 @@ runs:
       run: ${{ github.action_path }}/planemo_ci_actions.sh
       shell: bash
       env:
+        TMPDIR: ${{ runner.temp }}
         EVENT_BEFORE: ${{ github.event.before }}
         CREATE_CACHE: ${{ inputs.create-cache }}
         MULLED_CACHE_SEED: ${{ inputs.mulled-cache-seed != 'false' && format('{0}/mulled-cache-seed/biocontainers.json', runner.temp) || '' }}
