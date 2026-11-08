@@ -24,6 +24,20 @@ If none of these modes is set then a setup mode runs.
 In all modes required software will be installed automatically, i.e. `planemo` and `jq`. 
 The version of planemo can be controlled with the input `planemo-version` (default `"planemo"`, i.e. the latest version).
 
+For a `galaxy-branch` other than `master` or `main`, the action resolves the requested
+branch or tag to a commit and installs Galaxy's `util`, `tool_util_models`, and
+`tool_util` packages from that commit. It builds their wheels from one shallow
+checkout and caches them by repository, commit, operating system, architecture,
+and Python version. Subsequent jobs reuse the wheels without cloning Galaxy again.
+The three Galaxy packages are replaced even when different commits have the same
+package version; already-satisfied dependencies are kept.
+
+This small wheel cache is managed by the action and saved immediately after a
+successful installation. It is independent of `create-cache` and of caches managed
+by the calling workflow. Cache access failures fall back to a local build. The
+usual GitHub branch-scope restrictions still apply. Callers should continue caching
+`~/.cache/pip` for dependency downloads and `~/.planemo` for the Galaxy test environment.
+
 Assumptions
 -----------
 
