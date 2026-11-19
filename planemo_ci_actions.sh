@@ -19,6 +19,12 @@ else
 fi
 read -ra ADDITIONAL_PLANEMO_OPTIONS <<< "$ADDITIONAL_PLANEMO_OPTIONS"
 
+# A repository may ship a TPV (Total Perspective Vortex) configuration in its root,
+# .tpv.conf, which maps selected tools to job destinations with other settings - for
+# instance a container network mode that differs from the rest of the run. planemo layers
+# it on top of the TPV configuration it generates for the chunk.
+TPV_CONFIG="$PWD/.tpv.conf"
+
 
 # ensure that all files that are used for action outputs are present 
 mkdir -p upload
@@ -235,6 +241,7 @@ if [ "$MODE" == "test" ]; then
   touch .tt_biocontainer_skip
   while read -r -a TOOL_GROUP; do
     docker system prune --all --force --volumes || true
+    EXTERNAL_INSTANCE=false
     # Check if any of the lines in .tt_biocontainer_skip is a substring of $TOOL_GROUP
     if echo "${TOOL_GROUP[@]}" | grep -qf .tt_biocontainer_skip; then
       PLANEMO_OPTIONS=()
@@ -260,6 +267,14 @@ if [ "$MODE" == "test" ]; then
       set -x
       PLANEMO_OPTIONS=("--galaxy_url" "https://$INSTANCE")
       PLANEMO_TEST_OPTIONS=()
+      EXTERNAL_INSTANCE=true
+    fi
+
+    # TPV configuration of the repository, which the Galaxy instance planemo launches for
+    # this group layers on top of the configuration it generates (an external instance
+    # brings its own job configuration).
+    if [ "$EXTERNAL_INSTANCE" != "true" ] && [ -f "$TPV_CONFIG" ]; then
+      PLANEMO_OPTIONS+=(--tpv_config_file "$TPV_CONFIG")
     fi
 
     json=$(mktemp -u -p json_output --suff .json)

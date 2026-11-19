@@ -40,6 +40,10 @@ Tools/workflows in a path that has a prefix in:
 - `.tt_skip` are ignored in all modes
 - `.tt_biocontainer_skip` are not tested using containers but conda is used for resolving requirements.
 
+A `.tpv.conf` in the root of the repository can map individual tools to job destinations, for instance to
+run their containers with a different Docker network mode. It is picked up automatically, see "Container
+network modes" below.
+
 Tools and workflows are discovered in all directories, except for `packages/` and `deprecated/`. These directories may be absent.
 
 A global `.lint_skip` file and per repo `.lint_skip` files can be used to list tool/workflow linters that should be skipped.
@@ -150,6 +154,74 @@ Optional inputs:
 Output:
 
 The test mode creates a directory `upload/` containing the test results as json file.
+
+### Container network modes
+
+Some tool tests only pass - or only prove what they are supposed to prove - with a
+particular Docker network mode: a tool that talks to a service on `localhost` needs
+`host`, a test that should show that a tool works offline needs `none`. Galaxy passes the
+`docker_run_extra_arguments` job destination parameter on to `docker run`, so the mode of
+a whole chunk is a planemo option:
+
+```yaml
+      with:
+        mode: test
+        # ... repository-list, chunk, chunk-count, ...
+        additional-planemo-options: --docker_run_extra_arguments "--net none"
+```
+
+Selecting a mode per tool needs a job destination per tool, which TPV (Total Perspective
+Vortex) provides. Put a `.tpv.conf` in the root of the repository - the workspace the
+action runs in - and it is passed to planemo as `--tpv_config_file` for all chunks.
+Without such a file the default settings apply:
+
+```yaml
+# Everything that is not mapped to another destination runs without network.
+destinations:
+  planemo_default:
+    params:
+      docker_run_extra_arguments: "--net none"
+
+  full_network:
+    inherits: planemo_default
+    scheduling:
+      require:
+        - full_network
+    params:
+      docker_run_extra_arguments: "--net host"
+
+tools:
+  default: {}
+
+  (.*/)?fastqc(/.*)?$:
+    scheduling:
+      require:
+        - full_network
+```
+
+`planemo_default` is the destination planemo generates for the run, so redefining it keeps
+the runner and the container and volume settings and only adds the network argument - that
+makes "no network" the mode of every tool that is not listed in `tools`. `full_network`
+inherits it and gives one tool the default Docker network instead. Further destinations -
+for instance a user defined Docker network that has no default route - are a few more
+lines; see [Generated Job and TPV Configurations](https://planemo.readthedocs.io/en/latest/writing_advanced.html#generated-job-and-tpv-configurations)
+in the planemo documentation for what planemo generates and how the file is layered.
+
+The keys in `tools` are regular expressions matched against the tool id from its beginning.
+A tool tested from a directory has the id from the tool XML (`fastqc`), a tool installed
+from the Tool Shed has the full id (`toolshed.g2.bx.psu.edu/repos/iuc/fastqc/0.74+galaxy0`).
+`(.*/)?fastqc(/.*)?$` covers both, and `fastqc` alone would also select a tool called
+`fastqc_reporter`.
+
+Two notes:
+
+- The TPV configuration switches the whole chunk to TPV, which layers the configuration on
+  top of the one planemo generates. Tools that no configuration mentions are mapped to
+  `planemo_default`, i.e. they run exactly as they did before.
+- `--tpv_config_file` needs a planemo release that provides it (the planemo documentation
+  linked above describes the feature). Until that is released, a workflow using
+  `.tpv.conf` has to pin such a planemo branch, e.g.
+  `planemo-version: git+https://github.com/galaxyproject/planemo@main`.
 
 ### Retesting only previously-failed tests
 
